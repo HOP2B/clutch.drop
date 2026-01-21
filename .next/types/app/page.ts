@@ -1,4 +1,4 @@
-// File: C:\Users\User\Desktop\cs case opening project\app\page.tsx
+// File: /Users/25hp4068/clutch.drop/app/page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
