@@ -33,7 +33,9 @@ export default function Home() {
   const [openedItem, setOpenedItem] = useState<Skin | null>(null);
   const [loading, setLoading] = useState(true);
   const [rolling, setRolling] = useState(false);
-  const [rollingImage, setRollingImage] = useState<string>('');
+  const [slotImages, setSlotImages] = useState<string[]>([]);
+  const [translateY, setTranslateY] = useState(0);
+  const [spinCount, setSpinCount] = useState(0);
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json')
@@ -76,41 +78,43 @@ export default function Home() {
       });
   }, []);
 
-  const startRolling = (getItem: () => Skin | null) => {
-    if (skins.length === 0 || rolling) return;
+  const startRolling = (images: string[], getSelectedItem: (selectedImage: string) => Skin | null) => {
+    if (rolling) return;
     setRolling(true);
     setOpenedItem(null);
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * skins.length);
-      const item = skins[randomIndex];
-      if (item.image) {
-        setRollingImage(item.image);
-      }
-    }, 100);
+    setSlotImages(images);
+    setTranslateY(0);
+    const slideInterval = setInterval(() => {
+      setTranslateY(prev => prev - 30); // slide right
+    }, 50);
     setTimeout(() => {
-      clearInterval(interval);
-      const item = getItem();
+      clearInterval(slideInterval);
+      const selectedIndex = Math.floor(Math.random() * images.length);
+      setTranslateY(450 - selectedIndex * 150); // center the selected image
+      const selectedImage = images[selectedIndex];
+      const item = getSelectedItem(selectedImage);
       if (item) {
         setOpenedItem({ ...item, color: rarityColors[item.rarity] || '#ffffff' });
+        setSpinCount(prev => prev + 1);
       }
       setRolling(false);
-      setRollingImage('');
     }, 2000);
   };
 
   const openCase = (caseItem: Case) => {
-    startRolling(() => {
-      const randomIndex = Math.floor(Math.random() * caseItem.contains.length);
-      const skinId = caseItem.contains[randomIndex];
-      return skins.find(s => s.id === skinId) || null;
-    });
+    const images = caseItem.contains.map(id => skins.find(s => s.id === id)?.image || '').filter(Boolean);
+    if (images.length === 0) return;
+    startRolling(images, (selectedImage) => skins.find(s => s.image === selectedImage) || null);
   };
 
   const spinRandomSkin = () => {
-    startRolling(() => {
+    const images = [];
+    for (let i = 0; i < 30; i++) {
       const randomIndex = Math.floor(Math.random() * skins.length);
-      return skins[randomIndex];
-    });
+      const img = skins[randomIndex].image;
+      if (img) images.push(img);
+    }
+    startRolling(images, (selectedImage) => skins.find(s => s.image === selectedImage) || null);
   };
 
   if (loading) {
@@ -120,6 +124,7 @@ export default function Home() {
   return (
     <div className="app">
       <h1>CS Case Opening Simulator</h1>
+      <p className="spin-counter">Total Spins: {spinCount}</p>
       <button className="spin-all-btn" onClick={spinRandomSkin} disabled={rolling}>
         Spin Random Skin
       </button>
@@ -137,7 +142,19 @@ export default function Home() {
       {rolling && (
         <div className="rolling-display">
           <h2>Rolling...</h2>
-          {rollingImage && <img src={rollingImage} alt="Rolling skin" className="rolling-image" />}
+          <div className="slot-machine">
+            <div className="slot-track" style={{ transform: `translateX(${translateY}px)` }}>
+              {slotImages.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt={`Slot ${i}`}
+                  className="slot-image"
+                />
+              ))}
+            </div>
+            <div className="arrow">▼</div>
+          </div>
         </div>
       )}
       {openedItem && !rolling && (
