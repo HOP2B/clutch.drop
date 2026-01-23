@@ -84,13 +84,15 @@ export default function Home() {
     setOpenedItem(null);
     setSlotImages(images);
     setTranslateY(0);
+    let speed = 50; // initial speed
     const slideInterval = setInterval(() => {
-      setTranslateY(prev => prev - 30); // slide right
-    }, 50);
+      setTranslateY(prev => prev - speed);
+      if (speed > 5) speed -= 0.5; // slow down gradually
+    }, 20);
     setTimeout(() => {
       clearInterval(slideInterval);
       const selectedIndex = Math.floor(Math.random() * images.length);
-      setTranslateY(450 - selectedIndex * 150); // center the selected image
+      setTranslateY(600 - selectedIndex * 200); // center the selected image
       const selectedImage = images[selectedIndex];
       const item = getSelectedItem(selectedImage);
       if (item) {
@@ -98,7 +100,7 @@ export default function Home() {
         setSpinCount(prev => prev + 1);
       }
       setRolling(false);
-    }, 2000);
+    }, 6000);
   };
 
   const openCase = (caseItem: Case) => {
@@ -109,7 +111,7 @@ export default function Home() {
 
   const spinRandomSkin = () => {
     const images = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 50; i++) {
       const randomIndex = Math.floor(Math.random() * skins.length);
       const img = skins[randomIndex].image;
       if (img) images.push(img);

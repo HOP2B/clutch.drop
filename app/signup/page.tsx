@@ -1,20 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { useSignUp } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 
 export default function SignUpPage() {
-  const { signUp, setActive } = useSignUp()
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
-
-  if (!signUp || !setActive) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,40 +16,11 @@ export default function SignUpPage() {
       setError('Passwords do not match')
       return
     }
-    try {
-      const result = await signUp.create({
-        emailAddress: email,
-        password,
-      })
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId })
-        // Save user to MongoDB
-        try {
-          const response = await fetch('/api/save-user', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              clerkId: result.createdUserId,
-              email,
-            }),
-          })
-          if (!response.ok) {
-            throw new Error('Failed to save user to database')
-          }
-        } catch (saveError: any) {
-          console.error('Error saving user:', saveError)
-          setError('Account created but failed to save user data. Please contact support.')
-          return
-        }
-        router.push('/')
-      } else {
-        // Handle verification if needed
-        setError('Please check your email for verification.')
-      }
-    } catch (err: any) {
-      setError(err.errors[0].message)
+    if (email && password) {
+      // Placeholder for signup logic
+      router.push('/')
+    } else {
+      setError('Please enter email and password')
     }
   }
 

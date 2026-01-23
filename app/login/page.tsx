@@ -1,33 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { useSignIn } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 
 export default function SignInPage() {
-  const { signIn, setActive } = useSignIn()
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  if (!signIn || !setActive) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      const result = await signIn.create({
-        identifier: email,
-        password,
-      })
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId })
-        router.push('/')
-      }
-    } catch (err: any) {
-      setError(err.errors[0].message)
+    // Placeholder for login logic
+    if (email && password) {
+      router.push('/')
+    } else {
+      setError('Please enter email and password')
     }
   }
 

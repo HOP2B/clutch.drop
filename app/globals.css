@@ -13,9 +13,15 @@ body {
 }
 
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .app {
@@ -26,13 +32,26 @@ h1 {
   font-size: 2.5em;
   margin-bottom: 1rem;
   color: #ffd700;
-  text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700;
+  text-shadow:
+    0 0 10px #ffd700,
+    0 0 20px #ffd700,
+    0 0 30px #ffd700;
   animation: glowText 2s ease-in-out infinite alternate;
 }
 
 @keyframes glowText {
-  from { text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700; }
-  to { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700, 0 0 40px #ffd700; }
+  from {
+    text-shadow:
+      0 0 10px #ffd700,
+      0 0 20px #ffd700,
+      0 0 30px #ffd700;
+  }
+  to {
+    text-shadow:
+      0 0 20px #ffd700,
+      0 0 30px #ffd700,
+      0 0 40px #ffd700;
+  }
 }
 
 .spin-counter {
@@ -90,7 +109,7 @@ h1 {
   border: 2px solid #ffd700;
   border-radius: 10px;
   background-color: #2a2a2a;
-  min-width: 600px;
+  min-width: 1300px;
   text-align: center;
   color: #ffd700;
   font-size: 2em;
@@ -99,8 +118,8 @@ h1 {
 
 .slot-machine {
   position: relative;
-  width: 900px;
-  height: 200px;
+  width: 1200px;
+  height: 250px;
   overflow: hidden;
   margin: 1rem auto;
   border: 2px solid #444;
@@ -114,9 +133,9 @@ h1 {
 }
 
 .slot-image {
-  width: 150px;
-  height: 200px;
-  object-fit: cover;
+  width: 200px;
+  height: 250px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 
@@ -142,8 +161,14 @@ h1 {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .item-display.rare {
@@ -152,8 +177,14 @@ h1 {
 }
 
 @keyframes glow {
-  from { box-shadow: 0 0 20px #ffd700; }
-  to { box-shadow: 0 0 30px #ffd700, 0 0 40px #ffd700; }
+  from {
+    box-shadow: 0 0 20px #ffd700;
+  }
+  to {
+    box-shadow:
+      0 0 30px #ffd700,
+      0 0 40px #ffd700;
+  }
 }
 
 .item-image {
