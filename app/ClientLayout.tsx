@@ -1,6 +1,6 @@
 'use client'
 
-// import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider } from '@clerk/nextjs'
 
 export default function ClientLayout({
   children,
@@ -8,7 +8,7 @@ export default function ClientLayout({
   children: React.ReactNode
 }) {
   return (
-    // <ClerkProvider>
+    <ClerkProvider>
       <html lang="en">
         <body>
           <header style={{ backgroundColor: '#0a091a', padding: '10px 20px', display: 'flex', alignItems: 'center', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
@@ -23,6 +23,6 @@ export default function ClientLayout({
           </div>
         </body>
       </html>
-    // </ClerkProvider>
+    </ClerkProvider>
   )
 }
