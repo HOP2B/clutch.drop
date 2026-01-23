@@ -29,6 +29,26 @@ export default function SignUpPage() {
       })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
+        // Save user to MongoDB
+        try {
+          const response = await fetch('/api/save-user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              clerkId: result.createdUserId,
+              email,
+            }),
+          })
+          if (!response.ok) {
+            throw new Error('Failed to save user to database')
+          }
+        } catch (saveError: any) {
+          console.error('Error saving user:', saveError)
+          setError('Account created but failed to save user data. Please contact support.')
+          return
+        }
         router.push('/')
       } else {
         // Handle verification if needed
