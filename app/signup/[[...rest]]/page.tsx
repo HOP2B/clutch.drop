@@ -14,6 +14,12 @@ export default function SignUpPage() {
         elements: {
           footer: {
             display: 'none'
+          },
+          socialButtonsIconButton: {
+            color: '#ffffff'
+          },
+          socialButtonsBlockButton: {
+            color: '#ffffff'
           }
         }
       }}

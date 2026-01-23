@@ -14,6 +14,12 @@ export default function SignInPage() {
         elements: {
           footer: {
             display: 'none'
+          },
+          socialButtonsIconButton: {
+            color: '#ffffff'
+          },
+          socialButtonsBlockButton: {
+            color: '#ffffff'
           }
         }
       }}
