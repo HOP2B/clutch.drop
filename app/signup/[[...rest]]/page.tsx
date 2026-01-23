@@ -10,6 +10,14 @@ export default function SignUpPage() {
           colorInputText: '#ffffff',
           colorText: '#ffffff',
           colorPrimary: '#6366f1'
+        },
+        elements: {
+          socialButtonsIconButton: {
+            color: '#ffff00'
+          },
+          socialButtonsBlockButton: {
+            color: '#ffff00'
+          }
         }
       }}
     />
