@@ -1,6 +1,6 @@
 'use client'
 
-import { ClerkProvider, useUser } from '@clerk/nextjs'
+import { ClerkProvider, useUser, SignOutButton } from '@clerk/nextjs'
 
 function Header() {
   const { user } = useUser()
@@ -8,11 +8,16 @@ function Header() {
   return (
     <header style={{ backgroundColor: '#0a091a', padding: '10px 20px', display: 'flex', alignItems: 'center', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
       <img src="/logo.png" alt="Logo" style={{ height: '100px', width: 'auto', marginRight: '10px' }} />
-      <nav style={{ marginLeft: 'auto', display: 'flex', gap: '20px' }}>
+      <nav style={{ marginLeft: 'auto', display: 'flex', gap: '20px', alignItems: 'center' }}>
         {user ? (
           <>
             <a href="profile" style={{ color: 'white', textDecoration: 'none' }}>Profile</a>
             <a href="/" style={{ color: 'white', textDecoration: 'none' }}>Home</a>
+            <SignOutButton>
+              <button style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', textDecoration: 'underline' }}>
+                Log Out
+              </button>
+            </SignOutButton>
           </>
         ) : (
           <>
