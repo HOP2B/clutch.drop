@@ -13,10 +13,10 @@ export default function SignUpPage() {
         },
         elements: {
           socialButtonsIconButton: {
-            color: '#ffff00'
+            color: '#ffffff'
           },
           socialButtonsBlockButton: {
-            color: '#ffff00'
+            color: '#ffffff'
           }
         }
       }}
