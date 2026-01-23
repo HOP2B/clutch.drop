@@ -10,6 +10,11 @@ export default function ProfilePage() {
           colorInputText: '#ffffff',
           colorText: '#ffffff',
           colorPrimary: '#6366f1'
+        },
+        elements: {
+          footer: {
+            display: 'none'
+          }
         }
       }}
     />

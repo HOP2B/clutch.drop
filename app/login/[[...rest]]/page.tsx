@@ -12,11 +12,8 @@ export default function SignInPage() {
           colorPrimary: '#6366f1'
         },
         elements: {
-          socialButtonsIconButton: {
-            color: '#ffff00'
-          },
-          socialButtonsBlockButton: {
-            color: '#ffff00'
+          footer: {
+            display: 'none'
           }
         }
       }}
