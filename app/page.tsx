@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface Skin {
   id: number;
@@ -36,6 +36,9 @@ export default function Home() {
   const [slotImages, setSlotImages] = useState<string[]>([]);
   const [translateY, setTranslateY] = useState(0);
   const [spinCount, setSpinCount] = useState(0);
+  const [inventory, setInventory] = useState<Skin[]>([]);
+  const [selectedSkin, setSelectedSkin] = useState<Skin | null>(null);
+  const [showInventory, setShowInventory] = useState(false);
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json')
@@ -48,6 +51,15 @@ export default function Home() {
           skinArray = Object.values(skinsData).flat() as Skin[];
         }
         setSkins(skinArray);
+
+        // Load inventory from localStorage after skins are loaded
+        const savedInventory = localStorage.getItem('inventory');
+        if (savedInventory) {
+          const inventoryIds = JSON.parse(savedInventory);
+          const inventorySkins = skinArray.filter(skin => inventoryIds.includes(skin.id));
+          setInventory(inventorySkins);
+        }
+
         setLoading(false);
       })
       .catch(error => {
@@ -98,6 +110,15 @@ export default function Home() {
       if (item) {
         setOpenedItem({ ...item, color: rarityColors[item.rarity] || '#ffffff' });
         setSpinCount(prev => prev + 1);
+        // Add to inventory
+        setInventory(prev => {
+          if (!prev.some(skin => skin.id === item.id)) {
+            const newInventory = [...prev, item];
+            localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
+            return newInventory;
+          }
+          return prev;
+        });
       }
       setRolling(false);
     }, 6000);
@@ -127,6 +148,7 @@ export default function Home() {
     <div className="app">
       <h1>CS Case Opening Simulator</h1>
       <p className="spin-counter">Total Spins: {spinCount}</p>
+      <button className="inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
       <button className="spin-all-btn" onClick={spinRandomSkin} disabled={rolling}>
         Spin Random Skin
       </button>
@@ -165,6 +187,41 @@ export default function Home() {
           {openedItem.image && <img src={openedItem.image} alt={typeof openedItem.name === 'object' ? (openedItem.name as any).full || (openedItem.name as any).name || 'Skin' : openedItem.name} className="item-image" />}
           <p className="item-name">{typeof openedItem.name === 'object' ? (openedItem.name as any).full || (openedItem.name as any).name || '[Unknown]' : openedItem.name}</p>
           <p className="item-rarity">{String(openedItem.rarity)}</p>
+        </div>
+      )}
+      {selectedSkin && (
+        <div className="skin-modal" onClick={() => setSelectedSkin(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close" onClick={() => setSelectedSkin(null)}>&times;</span>
+            <h2>Skin Details</h2>
+            {selectedSkin.image && <img src={selectedSkin.image} alt={typeof selectedSkin.name === 'object' ? (selectedSkin.name as any).name || 'Skin' : selectedSkin.name} className="modal-image" />}
+            <p><strong>Name:</strong> {typeof selectedSkin.name === 'object' ? (selectedSkin.name as any).full || (selectedSkin.name as any).name || '[Unknown]' : selectedSkin.name}</p>
+            <p><strong>Rarity:</strong> {String(selectedSkin.rarity)}</p>
+            {/* Add more details if available */}
+          </div>
+        </div>
+      )}
+      {showInventory && (
+        <div className="inventory-modal" onClick={() => setShowInventory(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close" onClick={() => setShowInventory(false)}>&times;</span>
+            <h2>Inventory</h2>
+            {inventory.length === 0 ? (
+              <p>You have no skins.</p>
+            ) : (
+              <div className="inventory-grid">
+                {inventory.map(skin => (
+                  <img
+                    key={skin.id}
+                    src={skin.image || `https://via.placeholder.com/150x150?text=${encodeURIComponent(typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name)}`}
+                    alt={typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name}
+                    className="inventory-item"
+                    onClick={() => setSelectedSkin(skin)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

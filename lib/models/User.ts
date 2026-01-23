@@ -11,6 +11,10 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  inventory: {
+    type: [Number], // Array of skin IDs
+    default: [],
+  },
   createdAt: {
     type: Date,
     default: Date.now,
