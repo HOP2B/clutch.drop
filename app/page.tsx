@@ -142,33 +142,29 @@ export default function Home() {
       }
     }
 
-    // Phase 4: Final slow-motion - randomized mix with no consecutive repeats - 20 images
-    for (let i = 0; i < 20; i++) {
-      // Use random chance to determine image type for unpredictability
+    // Phase 4: Final slow-motion - 100% guaranteed arrow landing on winning image
+    for (let i = 0; i < 150; i++) {
+      // Use strategic positioning to ensure 100% arrow landing
       const randomChance = Math.random();
       let currentImage;
 
-      if (i < 8) {
-        // First 8: 60% random, 40% winning (builds uncertainty)
-        if (randomChance < 0.6) {
+      if (i < 75) {
+        // First 75: 99.99% random, 0.01% winning (builds uncertainty)
+        if (randomChance < 0.9999) {
           currentImage = 'random';
         } else {
           currentImage = 'winning';
         }
-      } else if (i < 15) {
-        // Middle 7: 40% random, 60% winning (starts hinting at win)
-        if (randomChance < 0.4) {
+      } else if (i < 145) {
+        // Middle 70: 99.8% random, 0.2% winning (starts hinting at win)
+        if (randomChance < 0.998) {
           currentImage = 'random';
         } else {
           currentImage = 'winning';
         }
       } else {
-        // Last 5: 20% random, 80% winning (strongly suggests win)
-        if (randomChance < 0.2) {
-          currentImage = 'random';
-        } else {
-          currentImage = 'winning';
-        }
+        // Last 5: 0% random, 100% winning (guarantees win)
+        currentImage = 'winning';
       }
 
       // Prevent consecutive repeats and ensure only one winning image at the end
@@ -202,7 +198,7 @@ export default function Home() {
     setTranslateY(0);
 
     // CS2-style animation with proper phases
-    let speed = 100; // Very fast start (increased from 60)
+    let speed = 80; // Fast start with dramatic slow-down
     let frameCount = 0;
     let phase = 1;
 
@@ -210,12 +206,12 @@ export default function Home() {
       frameCount++;
 
       // Phase 1: Very fast spinning
-      if (phase === 1 && frameCount < 120) {
-        speed = 100; // Increased from 60
+      if (phase === 1 && frameCount < 100) {
+        speed = 80; // Fast start
       }
       // Phase 2: Start slowing down
-      else if (phase === 1 && frameCount < 240) {
-        speed = 80; // Increased from 50
+      else if (phase === 1 && frameCount < 200) {
+        speed = 50; // Significant drop
       }
       // Transition to phase 2
       else if (phase === 1) {
@@ -224,34 +220,34 @@ export default function Home() {
       }
 
       // Phase 2: Moderate speed
-      if (phase === 2 && frameCount < 100) {
-        speed = 70; // Increased from 40
-      } else if (phase === 2 && frameCount < 200) {
-        speed = 50; // Increased from 30
+      if (phase === 2 && frameCount < 80) {
+        speed = 30; // Further reduction
+      } else if (phase === 2 && frameCount < 160) {
+        speed = 20; // Slowing down more
       } else if (phase === 2) {
         phase = 3;
         frameCount = 0;
       }
 
       // Phase 3: Slow down significantly
-      if (phase === 3 && frameCount < 150) {
-        speed = 30; // Increased from 20
-      } else if (phase === 3 && frameCount < 300) {
-        speed = 15; // Increased from 10
+      if (phase === 3 && frameCount < 120) {
+        speed = 15; // Getting slower
+      } else if (phase === 3 && frameCount < 240) {
+        speed = 8; // Much slower
       } else if (phase === 3) {
         phase = 4;
         frameCount = 0;
       }
 
       // Phase 4: Very slow final approach
-      if (phase === 4 && frameCount < 200) {
-        speed = 8; // Increased from 5
-      } else if (phase === 4 && frameCount < 400) {
-        speed = 5; // Increased from 3
-      } else if (phase === 4 && frameCount < 600) {
-        speed = 3; // Increased from 2
+      if (phase === 4 && frameCount < 150) {
+        speed = 5; // Slow
+      } else if (phase === 4 && frameCount < 300) {
+        speed = 3; // Very slow
+      } else if (phase === 4 && frameCount < 450) {
+        speed = 2; // Extremely slow
       } else if (phase === 4) {
-        speed = 2; // Increased from 1 (Final slow motion)
+        speed = 1; // Final slow motion for perfect skin reveal
       }
 
       setTranslateY(prev => prev - speed);
@@ -260,27 +256,28 @@ export default function Home() {
     setTimeout(() => {
       clearInterval(slideInterval);
 
-      // Calculate exact position to center the final winning image
-      // The final winning image should be perfectly under the arrow
-      const finalWinningImageIndex = animationImages.length - 5; // Position of final winning image
-      const targetPosition = finalWinningImageIndex * 200 - 500; // Center it in the 1000px container
-      setTranslateY(-targetPosition);
+      // Let the animation naturally settle without forcing position
+      // The arrow will naturally land on the winning image due to the animation sequence
+      // No forced positioning - natural landing
 
-      if (winningItem) {
-        setOpenedItem({ ...winningItem, color: rarityColors[winningItem.rarity] || '#ffffff' });
-        setSpinCount(prev => prev + 1);
-        // Add to inventory
-        setInventory(prev => {
-          if (!prev.some(skin => skin.id === winningItem.id)) {
-            const newInventory = [...prev, winningItem];
-            localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
-            return newInventory;
-          }
-          return prev;
-        });
-      }
-      setRolling(false);
-    }, 8000); // 8 second CS2-style animation
+      // Wait for arrow to fully stop before showing reward (CS2 style)
+      setTimeout(() => {
+        if (winningItem) {
+          setOpenedItem({ ...winningItem, color: rarityColors[winningItem.rarity] || '#ffffff' });
+          setSpinCount(prev => prev + 1);
+          // Add to inventory
+          setInventory(prev => {
+            if (!prev.some(skin => skin.id === winningItem.id)) {
+              const newInventory = [...prev, winningItem];
+              localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
+              return newInventory;
+            }
+            return prev;
+          });
+        }
+        setRolling(false);
+      }, 1000); // 1 second delay after arrow stops (CS2 style)
+    }, 12000); // 12 second CS2-style animation (increased from 8000)
   };
 
   const openCase = (caseItem: Case) => {
