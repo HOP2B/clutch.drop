@@ -94,26 +94,185 @@ export default function Home() {
     if (rolling) return;
     setRolling(true);
     setOpenedItem(null);
-    setSlotImages(images);
+
+    // Determine the winning image first
+    const winningIndex = Math.floor(Math.random() * images.length);
+    const winningImage = images[winningIndex];
+    const winningItem = getSelectedItem(winningImage);
+
+    // Create a CS2-style animation sequence
+    const animationImages = [];
+
+    // Phase 1: Fast random images (builds excitement) - 60 images
+    for (let i = 0; i < 60; i++) {
+      // Mix more random skins with occasional winning glimpses
+      const randomChance = Math.random();
+      if (randomChance < 0.1) {
+        // 10% chance for winning image to tease early
+        animationImages.push(winningImage);
+      } else {
+        const randomIndex = Math.floor(Math.random() * images.length);
+        animationImages.push(images[randomIndex]);
+      }
+    }
+
+    // Phase 2: Tease the win - highly mixed with many different weapons - 2000 images
+    for (let i = 0; i < 2000; i++) {
+      const randomChance = Math.random();
+      if (randomChance < 0.10) {
+        // 10% chance for winning image (reduced to prevent repeats)
+        animationImages.push(winningImage);
+      } else {
+        // 90% chance for different random weapons
+        const randomIndex = Math.floor(Math.random() * images.length);
+        animationImages.push(images[randomIndex]);
+      }
+    }
+
+    // Phase 3: Dramatic approach - maximum weapon variety - 2000 images
+    for (let i = 0; i < 2000; i++) {
+      const randomChance = Math.random();
+      if (randomChance < 0.20) {
+        // 20% chance for winning image (reduced to prevent repeats)
+        animationImages.push(winningImage);
+      } else {
+        // 80% chance for different random weapons
+        const randomIndex = Math.floor(Math.random() * images.length);
+        animationImages.push(images[randomIndex]);
+      }
+    }
+
+    // Phase 4: Final slow-motion - randomized mix with no consecutive repeats - 20 images
+    for (let i = 0; i < 20; i++) {
+      // Use random chance to determine image type for unpredictability
+      const randomChance = Math.random();
+      let currentImage;
+
+      if (i < 8) {
+        // First 8: 60% random, 40% winning (builds uncertainty)
+        if (randomChance < 0.6) {
+          currentImage = 'random';
+        } else {
+          currentImage = 'winning';
+        }
+      } else if (i < 15) {
+        // Middle 7: 40% random, 60% winning (starts hinting at win)
+        if (randomChance < 0.4) {
+          currentImage = 'random';
+        } else {
+          currentImage = 'winning';
+        }
+      } else {
+        // Last 5: 20% random, 80% winning (strongly suggests win)
+        if (randomChance < 0.2) {
+          currentImage = 'random';
+        } else {
+          currentImage = 'winning';
+        }
+      }
+
+      // Prevent consecutive repeats and ensure only one winning image at the end
+      const previousImage: string | undefined = animationImages[animationImages.length - 1];
+
+      if (currentImage === 'winning') {
+        if (previousImage === winningImage) {
+          // If previous was winning, force random to avoid repeat
+          const randomIndex = Math.floor(Math.random() * images.length);
+          animationImages.push(images[randomIndex]);
+        } else {
+          // Only add winning image if it's not consecutive
+          animationImages.push(winningImage);
+        }
+      } else {
+        if (previousImage && previousImage !== winningImage) {
+          // If previous was random, force winning to avoid repeat
+          animationImages.push(winningImage);
+        } else {
+          // Get a random image that's different from the previous
+          let randomIndex;
+          do {
+            randomIndex = Math.floor(Math.random() * images.length);
+          } while (images[randomIndex] === previousImage);
+          animationImages.push(images[randomIndex]);
+        }
+      }
+    }
+
+    setSlotImages(animationImages);
     setTranslateY(0);
-    let speed = 50; // initial speed
+
+    // CS2-style animation with proper phases
+    let speed = 100; // Very fast start (increased from 60)
+    let frameCount = 0;
+    let phase = 1;
+
     const slideInterval = setInterval(() => {
+      frameCount++;
+
+      // Phase 1: Very fast spinning
+      if (phase === 1 && frameCount < 120) {
+        speed = 100; // Increased from 60
+      }
+      // Phase 2: Start slowing down
+      else if (phase === 1 && frameCount < 240) {
+        speed = 80; // Increased from 50
+      }
+      // Transition to phase 2
+      else if (phase === 1) {
+        phase = 2;
+        frameCount = 0;
+      }
+
+      // Phase 2: Moderate speed
+      if (phase === 2 && frameCount < 100) {
+        speed = 70; // Increased from 40
+      } else if (phase === 2 && frameCount < 200) {
+        speed = 50; // Increased from 30
+      } else if (phase === 2) {
+        phase = 3;
+        frameCount = 0;
+      }
+
+      // Phase 3: Slow down significantly
+      if (phase === 3 && frameCount < 150) {
+        speed = 30; // Increased from 20
+      } else if (phase === 3 && frameCount < 300) {
+        speed = 15; // Increased from 10
+      } else if (phase === 3) {
+        phase = 4;
+        frameCount = 0;
+      }
+
+      // Phase 4: Very slow final approach
+      if (phase === 4 && frameCount < 200) {
+        speed = 8; // Increased from 5
+      } else if (phase === 4 && frameCount < 400) {
+        speed = 5; // Increased from 3
+      } else if (phase === 4 && frameCount < 600) {
+        speed = 3; // Increased from 2
+      } else if (phase === 4) {
+        speed = 2; // Increased from 1 (Final slow motion)
+      }
+
       setTranslateY(prev => prev - speed);
-      if (speed > 5) speed -= 0.5; // slow down gradually
-    }, 20);
+    }, 16); // 60fps for smooth animation
+
     setTimeout(() => {
       clearInterval(slideInterval);
-      const selectedIndex = Math.floor(Math.random() * images.length);
-      setTranslateY(600 - selectedIndex * 200); // center the selected image
-      const selectedImage = images[selectedIndex];
-      const item = getSelectedItem(selectedImage);
-      if (item) {
-        setOpenedItem({ ...item, color: rarityColors[item.rarity] || '#ffffff' });
+
+      // Calculate exact position to center the final winning image
+      // The final winning image should be perfectly under the arrow
+      const finalWinningImageIndex = animationImages.length - 5; // Position of final winning image
+      const targetPosition = finalWinningImageIndex * 200 - 500; // Center it in the 1000px container
+      setTranslateY(-targetPosition);
+
+      if (winningItem) {
+        setOpenedItem({ ...winningItem, color: rarityColors[winningItem.rarity] || '#ffffff' });
         setSpinCount(prev => prev + 1);
         // Add to inventory
         setInventory(prev => {
-          if (!prev.some(skin => skin.id === item.id)) {
-            const newInventory = [...prev, item];
+          if (!prev.some(skin => skin.id === winningItem.id)) {
+            const newInventory = [...prev, winningItem];
             localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
             return newInventory;
           }
@@ -121,7 +280,7 @@ export default function Home() {
         });
       }
       setRolling(false);
-    }, 6000);
+    }, 8000); // 8 second CS2-style animation
   };
 
   const openCase = (caseItem: Case) => {
