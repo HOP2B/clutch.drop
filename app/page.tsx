@@ -39,6 +39,7 @@ export default function Home() {
   const [inventory, setInventory] = useState<Skin[]>([]);
   const [selectedSkin, setSelectedSkin] = useState<Skin | null>(null);
   const [showInventory, setShowInventory] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json')
@@ -303,13 +304,20 @@ export default function Home() {
   return (
     <div className="app">
       <h1>CS Case Opening Simulator</h1>
+      <input
+        type="text"
+        placeholder="Search cases..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="search-input"
+      />
       <p className="spin-counter">Total Spins: {spinCount}</p>
       <button className="inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
       <button className="spin-all-btn" onClick={spinRandomSkin} disabled={rolling}>
         Spin Random Skin
       </button>
       <div className="cases-grid">
-        {cases.map(caseItem => (
+        {cases.filter(caseItem => caseItem.name.toLowerCase().includes(searchQuery.toLowerCase())).map(caseItem => (
           <img
             key={caseItem.id}
             src={caseItem.image || `https://via.placeholder.com/150x150?text=${encodeURIComponent(caseItem.name)}`}
