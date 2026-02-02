@@ -331,6 +331,44 @@ h1 {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
+/* Clerk Profile page styling */
+.cl-user-profile .cl-card,
+.cl-user-profile .cl-header,
+.cl-user-profile .cl-main,
+.cl-user-profile .cl-navbar,
+.cl-user-profile .cl-section,
+.cl-user-profile .cl-profilePage,
+.cl-user-profile .cl-rootBox,
+.cl-user-profile .cl-accordionItem,
+.cl-user-profile .cl-identityCard,
+.cl-user-profile .cl-userButtonPopoverCard,
+.cl-user-profile [class*="cl-"][class*="card"],
+.cl-user-profile [class*="cl-"][class*="header"],
+.cl-user-profile [class*="cl-"][class*="main"],
+.cl-user-profile [class*="cl-"][class*="section"] {
+  background-color: #0a091a !important;
+}
+
+.cl-user-profile .cl-navbarButton,
+.cl-user-profile .cl-sectionTitle,
+.cl-user-profile .cl-sectionDescription,
+.cl-user-profile .cl-formFieldLabel,
+.cl-user-profile .cl-formFieldValue,
+.cl-user-profile [class*="cl-"][class*="text"],
+.cl-user-profile [class*="cl-"][class*="title"],
+.cl-user-profile [class*="cl-"][class*="description"] {
+  color: #ffffff !important;
+}
+
+.cl-user-profile .cl-badge {
+  background-color: #1a1a2e !important;
+  color: #ffffff !important;
+}
+
+.cl-user-profile .cl-accordionItem {
+  border-bottom: 1px solid #1a1a2e !important;
+}
+
 /* Hide Clerk development banner and footer */
 .clerk-banner,
 .cl-footer,
