@@ -330,3 +330,13 @@ h1 {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.8);
 }
+
+/* Hide Clerk development banner and footer */
+.clerk-banner,
+.cl-footer,
+.clerk-footer,
+[class*="clerk"][class*="banner"],
+[class*="clerk"][class*="footer"],
+[class*="secured-by-clerk"] {
+  display: none !important;
+}
