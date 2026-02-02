@@ -1,6 +1,6 @@
 'use client'
 
-// import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider } from '@clerk/nextjs'
 
 export default function ClerkWrapper({
   children,
@@ -8,8 +8,8 @@ export default function ClerkWrapper({
   children: React.ReactNode
 }) {
   return (
-    // <ClerkProvider>
-      <>{children}</>
-    // </ClerkProvider>
+    <ClerkProvider>
+      {children}
+    </ClerkProvider>
   )
 }
