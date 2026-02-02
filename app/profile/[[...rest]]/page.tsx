@@ -9,7 +9,10 @@ export default function ProfilePage() {
           colorInputBackground: '#1a1a2e',
           colorInputText: '#ffffff',
           colorText: '#ffffff',
-          colorPrimary: '#6366f1'
+          colorPrimary: '#6366f1',
+          colorDanger: '#ef4444',
+          colorSuccess: '#22c55e',
+          colorWarning: '#eab308'
         },
         elements: {
           footer: {
@@ -42,6 +45,39 @@ export default function ProfilePage() {
           },
           rootBox: {
             backgroundColor: '#0a091a'
+          },
+          profilePage: {
+            backgroundColor: '#0a091a'
+          },
+          main: {
+            backgroundColor: '#0a091a'
+          },
+          userProfileCard: {
+            backgroundColor: '#0a091a'
+          },
+          userButtonPopoverCard: {
+            backgroundColor: '#0a091a'
+          },
+          accordionItem: {
+            backgroundColor: '#0a091a',
+            borderBottom: '1px solid #1a1a2e'
+          },
+          accordionTriggerButton: {
+            color: '#ffffff',
+            backgroundColor: '#0a091a'
+          },
+          formFieldLabel: {
+            color: '#ffffff'
+          },
+          formFieldValue: {
+            color: '#ffffff'
+          },
+          identityCard: {
+            backgroundColor: '#0a091a'
+          },
+          badge: {
+            backgroundColor: '#1a1a2e',
+            color: '#ffffff'
           }
         }
       }}
