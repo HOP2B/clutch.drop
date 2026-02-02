@@ -16,7 +16,10 @@ function Header() {
             <a href="/signup" style={{ color: 'white', textDecoration: 'none', backgroundColor: '#6366f1', padding: '8px 16px', borderRadius: '4px' }}>Sign up</a>
           </>
         ) : (
-          <UserButton />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <a href="/profile" style={{ color: 'white', textDecoration: 'none' }}>Settings</a>
+            <UserButton />
+          </div>
         )}
       </nav>
     </header>
