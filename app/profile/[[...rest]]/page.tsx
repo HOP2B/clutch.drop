@@ -14,6 +14,34 @@ export default function ProfilePage() {
         elements: {
           footer: {
             display: 'none'
+          },
+          card: {
+            backgroundColor: '#0a091a',
+            border: '1px solid #1a1a2e'
+          },
+          header: {
+            backgroundColor: '#0a091a'
+          },
+          navbar: {
+            backgroundColor: '#0a091a'
+          },
+          navbarButton: {
+            color: '#ffffff',
+            '&:hover': {
+              backgroundColor: '#1a1a2e'
+            }
+          },
+          section: {
+            backgroundColor: '#0a091a'
+          },
+          sectionTitle: {
+            color: '#ffffff'
+          },
+          sectionDescription: {
+            color: '#cccccc'
+          },
+          rootBox: {
+            backgroundColor: '#0a091a'
           }
         }
       }}
