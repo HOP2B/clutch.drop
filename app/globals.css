@@ -378,3 +378,182 @@ h1 {
 [class*="secured-by-clerk"] {
   display: none !important;
 }
+
+/* Upgrader Button */
+.upgrader-btn {
+  background-color: rgba(75, 0, 130, 0.7);
+  border: 1px solid #9932cc;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-bottom: 1rem;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.upgrader-btn:hover {
+  background-color: rgba(128, 0, 128, 0.9);
+}
+
+/* Upgrader Page Styles */
+.upgrader-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 1rem;
+}
+
+.upgrader-header .back-btn {
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid #666;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.upgrader-header .back-btn:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.upgrade-info {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.upgrade-info p {
+  margin: 0.5rem 0;
+  color: #ccc;
+}
+
+.selected-skins {
+  margin-bottom: 2rem;
+}
+
+.selected-skins h3 {
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+
+.selected-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  min-height: 100px;
+  padding: 1rem;
+  background-color: rgba(75, 0, 130, 0.2);
+  border-radius: 8px;
+  border: 1px solid #9932cc;
+}
+
+.selected-skin-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid;
+  transition: transform 0.2s;
+}
+
+.selected-skin-item:hover {
+  transform: scale(1.05);
+}
+
+.selected-skin-item img {
+  max-width: 80px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.selected-skin-item .skin-name {
+  font-size: 0.8em;
+  color: #ccc;
+  text-align: center;
+}
+
+.selected-skin-item .skin-rarity {
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.upgrade-btn {
+  background-color: #9932cc;
+  border: none;
+  color: white;
+  padding: 15px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 0 10px rgba(153, 50, 204, 0.5);
+}
+
+.upgrade-btn:hover:not(:disabled) {
+  background-color: #ba55d3;
+  transform: scale(1.05);
+}
+
+.upgrade-btn:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.upgrade-result {
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(75, 0, 130, 0.3);
+  border: 2px solid #9932cc;
+  border-radius: 10px;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.upgrade-result h2 {
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+
+.upgrade-result .result-image {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.upgrade-result .result-name {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.upgrade-result .result-rarity {
+  font-size: 1.1em;
+}
+
+.empty-inventory {
+  color: #888;
+  font-style: italic;
+  margin-top: 1rem;
+}
