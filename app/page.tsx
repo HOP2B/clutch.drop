@@ -24,7 +24,8 @@ const rarityColors: { [key: string]: string } = {
   'Restricted': '#ff6347',
   'Classified': '#ff1493',
   'Covert': '#dc143c',
-  'Special Item': '#ffd700',
+  'Special': '#ffd700',
+  'Ultra Rare': '#ff4500', // Orange-red for ultra rare
 };
 
 const rarityWeights: { [key: string]: number } = {
@@ -34,7 +35,7 @@ const rarityWeights: { [key: string]: number } = {
   'Restricted': 20,
   'Classified': 10,
   'Covert': 5,
-  'Special Item': 2,
+  'Special': 2, // Very low drop chance
 };
 
 export default function Home() {
@@ -102,7 +103,32 @@ export default function Home() {
       { id: 46, name: 'Glock-18 | Groundwater', rarity: 'Industrial Grade', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2kpnj9h1I4M2hZK17Jc-fB2CY1aBzseQ4GXG1lEwk4mWHmd39dC7BOwImD8F2QedeshjrkYKyML-z4Q3flcsbmqxtqryL/360fx360f', color: '#32cd32' },
       { id: 47, name: 'M4A1-S | VariCamo', rarity: 'Industrial Grade', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwjFS4_ega6F_H_iKMXGR0-d1sexmcCW6khUz_WjSw9qgd32TaAV1DMAlRrNcuhG7xt2yM-_ktlHW2tlHxHqs2iJI7yZ1o7FVeF8MW04/330x192?allow_animated=1', color: '#32cd32' },
       { id: 48, name: 'P90 | Scorched', rarity: 'Industrial Grade', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLhx8bf7jJk6_O-eKhoH_yaCW-Ej7Yi5LI7F3jrk05y4G-HzY37dCiRPVAnCpZ3R-MI4BnpkICxMLjr5QHAy9USM2Zemfk/360fx360f', color: '#32cd32' },
-    ];
+      { id: 49, name: 'karambit | Blue gem', rarity: 'special', image:'https://key-drop.com/blog/wp-content/uploads/2024/08/karambit-blue-gem-4-fn-1024x354.webp', color: '#FFD700'},
+      { id: 50, name: 'M9 Bayonet | Crimson Web', rarity: 'special', image:'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMW-J_vlzsvJWQyC0nQlp4GrWzYuqeHjDZlN1XJohTecO5xawwdDvNuLm5wPcjY0QzyX83Xsd7zErvbgxKe4lfw/360fx360f', color: '#FFD700'},
+      { id: 51, name: 'Karambit | Crimson Web', rarity: 'special', image:'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Q7uCvZaZkNM-bF1iHxOxlj-1gSCGn20wi4mTcyoyoeS_Dbwd2Cpd0RrMK4RbqxNTvZLyw7lff3Y5GxX6oiiNXrnE86bQY1_c/360fx360f', color: '#FFD700'},
+      { id: 52, name: 'Karambit | Doppler Sapphire', rarity: 'special', image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/images/wiki_sLfXhlc_preview.png', color: '#FFD700'},
+      { id: 53, name: 'Butterfly Knife | Doppler Sapphire', rarity: 'special', image:'https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf0ebcZThQ6tCvq4GGqOT1I6vZn3lU18hwmOvN8IXvjVCLqSwwOj6rYJiRdg42NAuE-lW5kri5hpbuvM7AzHtmsnMh4imPzUa3gB4aaOw9hfCeVxzAUJ5TOTzr', color: '#FFD700'},
+      { id: 54, name: 'M9 Bayonet | Doppler Sapphire', rarity: 'special', image: 'https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf3qr3czxb49KzgL-KmsjnMqvBnmJD7fp8i_vD-Yn8klGwlB81NDG3OtSUJgY7YVvS-VfolLq7hsO5tZ_OnXo3uyhz7SyPnhGx0xoeb-dugKOACQLJ28w8Lgw', color: '#FFD700'},
+      { id: 55, name: 'Karambit | Ruby', rarity: 'special', image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/images/wiki_W2yOMPY_preview.png', color: '#FFD700ff'},
+      { id: 56, name: 'Butterfly Knife | Gamma Doppler Emerald fn', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Z-ua6bbZrLOmsD2qvxu97veBWSyajhREioQKVko7qJHj4Ml93UtZuTbULtxfsxNDjZejqtFbajIMUyy36iytOvS1u5-ZXVPAt_PbejgiSZap9v8cjE0cexQ/360fx360f', color: '#FFD700ff'},
+      { id: 57, name: 'Butterfly Knife | Tiger Tooth', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Z-ua6bbZrLOmsD2mv1edxtfNWQDuymxoijDGMnYftb3mfOg8hAsFzRrYCtxKxxtPlZOnl5gaM3ogQmX_7jnkdvHppseoGVvI7uvqAJhUGkWs/360fx360f', color: '#FFD700ff'},
+      { id: 58, name: 'M9 Bayonet | Marble Fade', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMWad_uN3ouNlSha1lBkijDGMnYftb3OTbVRyD8Z1RrNctkS6kobkZLzi7gTW2NpFxH33hi9Nuno65uxXAqs7uvqA7lyFHH4/360fx360f', color: '#FFD700'},
+      { id: 59, name: 'Huntsman Knife | Fade', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1P7vG6YadsLM-SD1iWwOpzj-1gSCGn2x8hsW6DmIqpcXjBZgYkCZt5F7VcthS8ldS2Nr7m5VCMi4gRyyuqjHtXrnE8oar8MtU/360fx360f', color: '#FFD700'},
+      { id: 60, name: 'Karambit | Marble Fade', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Q7uCvZaZkNM-SA1idwPx0vORWSSi3kCIrujqNjsGveH2RaVRxX5ohEe4Juhawm4fiM-ji4APf2YMXmSz_hyoduytv4uhWT-N7rfLHGBJ4/360fx360f', color: '#FFD700'},
+      { id: 61, name: 'Butterfly Knife | Doppler (Ruby)', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf0ebcZThQ6tCvq4GGqOXhMaLum2pD6sl0g_PE8bP5gVO8v11tZGmgINfDJAU_NArYqVO8weq80ZXvuZ_Pm3NluSNz5n7dm0Phgk4YcKUx0gttBNHX', color: '#FFD700'},
+      { id: 62, name: 'Karambit | Lore', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Q7uCvZaZkNM-QG1ibwPx3vd5lQDu2qhEutDWR1IqrIHLCZlUmDJYlTLFb50HuwdyxPu2w4lCKjI5HniT2jS1PuCxj5e0cEf1y9ZCADXU/360fx360f', color: '#FFD700'},
+      { id: 63, name: 'Skeleton Knife | Fade', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1I5PeibbBiLs-SD1iWwOpzj-1gSCGn20kjt2-En9mpcCmQag8hXsciQeJYthW9kILkMLji4g3Ygo8Uznj6jX9XrnE8raC5r1M/360fx360f', color: '#FFD700'},
+      { id: 64, name: 'Bayonet | Doppler', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLzn4_v8ydP0POjV6BiMOCfC3Wv0eZ3o-Q6cCW6khUz_T_TydyheXmVZwYoXpR5R-YIsRe6lIazP-7h4Qzbj4hEzSyq3HgY7ix1o7FVS1Hc8lA/360fx360f', color: '#FFD700'},
+      { id: 65, name: 'Flip Knife | Autotronic', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1d4_u-V6N-H_afB3evwPtiv_V7QCe6liIqtjmMj4K3cn2ealB1CZolF7UIsBW6k9CxYurk71bdjdgWmSSoj3tAv31rtb0LV71lpPO5lCn5IQ/360fx360f', color: '#FFD700'},
+      { id: 66, name: 'Gut Knife | Doppler Sapphire', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1c-uaRaalSM_GDHm-Z0-tJveB7TSW2nAcitwKJk4jxNWWQO1IjW5d4RLUOsEG_lYCxZbjq5QDejYlBnn6o2y9LvCti4OtRUfUl5OSJ2CIbbpiB', color: '#FFD700'},
+      { id: 67, name: 'Falchion Knife | Damascus Steel', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1d7v6tYK1iLs-SH1iUwON3o-J8XBbqxSIqtjmMj4K3IyiSOwAjCJMiR-8JtBDukd3gYrzjtFHbiYIQyiythnxO53k9teYAAr1lpPNG4XW_dA/360fx360f', color: '#FFD700ff'},
+      { id: 68, name: 'Shadow Daggers | Doppler Sapphire', rarity: 'special', image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/images/wiki_CzAWS9a_preview.png', color: '#FFD700'},
+      { id: 69, name: 'Stiletto Knife | Doppler Black Pearl', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJfwOfBfThW-NOJlY20lfv1MLDBk2pD5Pp8i_vD-Yn8klGwlB81NDG3Oo-QIQA7ZFnSqVG9wuju0cfpucvLnHNivyFw7HrbmEGxgBxOaOFu1qCACQLJ4GHavAc', color: '#FFD700'},
+      { id: 70, name: 'Skeleton Knife | Urban Masked', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1I5PeibbBiLs-AHliEwP5zj_R7TSi9qhAitzSQl8H9Ii_GOAdyW8BwEOcI40W9kYbnNuq0tQbWjYwWxCut3Cod5yY94LpXT-N7rf4dDCBO/360fx360f', color: '#FFD700'},
+      { id: 71, name: 'Paracord Knife | Blue Steel', rarity: 'special', image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Y4OCqV6V8H_KfG2KU_uNztOh8Qmeywkpw5DjVyNj9cnORbwMjWJRzQOFYtBnpw9CxZungtQ3XiotHxXn5kGoXuZ6hVFhI/360fx360f', color: '#FFD700'},
+      { id: 72, name: 'Bowie Knife | Lore', rarity: 'special', image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1I-uC4YbJsLM-RAXCZxNF1pd5rQD66kCIrvC-ApYL8JSLSMxhyCMchQLFbthe4wNK0P7vislPcjItMxH2qjn5P6iZtteZQUPYi8_WGkUifZt4J9khU/360fx360f', color: '#FFD700'},
+    ]; 
+    
 
     setSkins(hardcodedSkins);
 
@@ -122,49 +148,49 @@ export default function Home() {
         id: 1,
         name: 'Dragon Lore Case',
         image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/csgo/resource/flash/econ/weapon_cases/crate_eslcologne2015_promo_de_cbble.png',
-        contains: [1, 2, 3, 17, 18, 19, 25, 26, 27, 33, 34, 35, 41, 42, 43, 49, 50, 51, 52, 53, 54, 55, 56] // Mix of rarities
+        contains: [1, 2, 3, 17, 18, 19, 25, 26, 27, 33, 34, 35, 41, 42, 43, 62, 72, 51,] // Mix of rarities
       },
       {
         id: 2,
         name: 'Gamma Case',
         image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHEVtvP5bPZrd6XECmOSxe0v4bRoTnnjwBkitWrRm4yoeX3GagMnCZZ2FPlK7EcEv22BnQ/360fx360f',
-        contains: [4, 5, 6, 20, 21, 22, 28, 29, 30, 36, 37, 38, 44, 45, 46, 49, 50, 51, 52, 53, 54, 55, 56]
+        contains: [4, 5, 6, 20, 21, 22, 28, 29, 30, 36, 37, 38, 44, 45, 46, 52, 53, 54,]
       },
       {
         id: 3,
         name: 'Spectrum Case',
         image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHQV7qCra_JscqPGCzLCl78ktuAxHSzmzUh_sjvWzdqoI33CaQF2DscjR_lK7EeF3oM7TA/360fx360f',
-        contains: [7, 8, 9, 23, 24, 31, 32, 39, 40, 47, 48, 1, 2, 3, 4, 49, 50, 51, 52, 53, 54, 55, 56] // Some overlaps
+        contains: [7, 8, 9, 23, 24, 31, 32, 39, 40, 47, 48, 1, 2, 3, 4, 55, 56, 57] // Some overlaps
       },
       {
         id: 4,
         name: 'Chroma Case',
         image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fq2wP7qr6bqI5cvHDCzfBlbcv57JqF3zrxRkj4W6Dwo34dy6QPQAoC5ZyW6dU5cxvklfG/360fx360f',
-        contains: [10, 11, 12, 17, 18, 19, 25, 26, 27, 33, 34, 35, 41, 42, 43, 49, 50, 51, 52, 53, 54, 55, 56]
+        contains: [10, 11, 12, 17, 18, 19, 25, 26, 27, 33, 34, 35, 41, 42, 43, 58, 59, 60]
       },
       {
         id: 5,
         name: 'Shadow Case',
         image: 'https://images.steamusercontent.com/ugc/2004717947593956802/C0C33DE5BD039BB5A4CA7F3B52B5E1F2A3A6954A/',
-        contains: [13, 14, 15, 20, 21, 22, 28, 29, 30, 36, 37, 38, 44, 45, 46, 49, 50, 51, 52, 53, 54, 55, 56]
+        contains: [13, 14, 15, 20, 21, 22, 28, 29, 30, 36, 37, 38, 44, 45, 46, 61, 49, 63]
       },
       {
         id: 6,
         name: 'Falchion Case',
         image: 'https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fpWwI7Pb-P6Y5dvPEDGSSlrsh57U8HHHiwx5yt2-Dwo7_JSnCOw8oCJF0W6dU5dgrLNA1/360fx360f',
-        contains: [16, 1, 2, 23, 24, 31, 32, 39, 40, 47, 48, 3, 4, 5, 6, 49, 50, 51, 52, 53, 54, 55, 56]
+        contains: [16, 1, 2, 23, 24, 31, 32, 39, 40, 47, 48, 3, 4, 5, 6, 64, 65, 66]
       },
       {
         id: 7,
         name: 'Revolver Case',
         image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHIV7qWvOqE9IqSVWGKVlu8v6eM7Girmxkwl4TnWmIv8J36WagEiCpImQvlK7EclOzxxiQ/360fx360f',
-        contains: [7, 8, 9, 17, 18, 19, 25, 26, 27, 33, 34, 35, 41, 42, 43, 49, 50, 51, 52, 53, 54, 55, 56]
+        contains: [7, 8, 9, 17, 18, 19, 25, 26, 27, 33, 34, 35, 41, 42, 43, 67, 68, 69]
       },
       {
         id: 8,
         name: 'Dreams & Nightmares Case',
         image: 'https://community.akamai.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnIV7Kb5OaU-JqfHDzXFle0u4LY8Gy_kkRgisGzcm4v4J3vDOAQmDMdyRvlK7EcmeCU3yw/360fx360f',
-        contains: [10, 11, 12, 20, 21, 22, 28, 29, 30, 36, 37, 38, 44, 45, 46, 49, 50, 51, 52, 53, 54, 55, 56]
+        contains: [10, 11, 12, 20, 21, 22, 28, 29, 30, 36, 37, 38, 44, 45, 46, 70, 71, 50]
       }
     ];
 
@@ -374,7 +400,7 @@ export default function Home() {
       }
     }
     if (!winningSkin) winningSkin = caseSkins[caseSkins.length - 1];
-    const images = caseSkins.map(s => s.image || '').filter(Boolean);
+    const images = caseSkins.map(s => s.image || '').filter((img): img is string => Boolean(img));
     startRolling(images, winningSkin);
   };
 
