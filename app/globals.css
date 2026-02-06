@@ -331,6 +331,231 @@ h1 {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
+.inventory-modal-content {
+  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+  padding: 0;
+  border: 2px solid #ffd700;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 80vh;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+.inventory-title {
+  color: #ffd700 !important;
+  margin: 1.5rem 0 1rem 0 !important;
+  font-size: 2rem !important;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.inventory-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.inventory-count {
+  color: #ccc;
+  font-size: 1.1rem;
+}
+
+.inventory-rarity-count {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.rarity-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: white;
+  font-weight: bold;
+}
+
+.empty-inventory {
+  padding: 3rem;
+  color: #888;
+}
+
+.empty-inventory p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.inventory-scroll-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.inventory-scroll-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.inventory-scroll-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 5px;
+}
+
+.inventory-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ffd700, #b8860b);
+  border-radius: 5px;
+}
+
+.inventory-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ffed4a, #ffd700);
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.inventory-item-card {
+  background: linear-gradient(145deg, #252525, #1a1a1a);
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.inventory-item-card:hover {
+  transform: translateY(-5px);
+  border-color: #ffd700;
+  box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+}
+
+.item-card-image-container {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.inventory-item {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.inventory-item-card:hover .inventory-item {
+  transform: scale(1.05);
+}
+
+.item-card-rarity-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 0 0 8px 8px;
+}
+
+.item-card-info {
+  text-align: center;
+}
+
+.item-card-name {
+  color: white;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem 0;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-card-rarity {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.delete-item-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(220, 20, 60, 0.9);
+  border: 2px solid white;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.inventory-item-card:hover .delete-item-btn {
+  opacity: 1;
+}
+
+.delete-item-btn:hover {
+  background: rgba(255, 0, 0, 1);
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.sell-item-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(46, 204, 113, 0.9);
+  border: 2px solid white;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.inventory-item-card:hover .sell-item-btn {
+  opacity: 1;
+}
+
+.sell-item-btn:hover {
+  background: rgba(46, 204, 113, 1);
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+}
+
+.item-card-price {
+  display: block;
+  color: #2ecc71 !important;
+  font-size: 1rem !important;
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
+
+.inventory-balance {
+  color: #2ecc71;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
 /* Clerk Profile page styling */
 .cl-user-profile .cl-card,
 .cl-user-profile .cl-header,

@@ -8,6 +8,7 @@ interface Skin {
   rarity: string;
   image?: string;
   color?: string;
+  price?: number;
 }
 
 interface Case {
@@ -38,6 +39,16 @@ const rarityWeights: { [key: string]: number } = {
   'Special': 2, // Very low drop chance
 };
 
+const rarityPrices: { [key: string]: number } = {
+  'Consumer Grade': 5,
+  'Industrial Grade': 10,
+  'Mil-Spec': 15,
+  'Restricted': 25,
+  'Classified': 50,
+  'Covert': 100,
+  'Special Item': 200,
+};
+
 export default function Home() {
   const [skins, setSkins] = useState<Skin[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
@@ -51,6 +62,7 @@ export default function Home() {
   const [selectedSkin, setSelectedSkin] = useState<Skin | null>(null);
   const [showInventory, setShowInventory] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [balance, setBalance] = useState<number>(0);
 
   useEffect(() => {
     // Hardcoded skins for the cases
@@ -197,6 +209,26 @@ export default function Home() {
     setCases(hardcodedCases);
   }, []);
 
+  const deleteFromInventory = (skinId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setInventory(prev => {
+      const newInventory = prev.filter(skin => skin.id !== skinId);
+      localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
+      return newInventory;
+    });
+  };
+
+  const sellItem = (skin: Skin, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const sellPrice = skin.price || 10; // Default price if not set
+    setBalance(prev => prev + sellPrice);
+    setInventory(prev => {
+      const newInventory = prev.filter(s => s.id !== skin.id);
+      localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
+      return newInventory;
+    });
+  };
+
   const startRolling = (images: string[], winningItem: Skin) => {
     if (rolling) return;
     setRolling(true);
@@ -299,7 +331,7 @@ export default function Home() {
       }
     }
 
-    setSlotImages(animationImages);
+    setSlotImages(animationImages.filter((img): img is string => img !== undefined));
     setTranslateY(0);
 
     // CS2-style animation with proper phases
@@ -497,22 +529,67 @@ export default function Home() {
       )}
       {showInventory && (
         <div className="inventory-modal" onClick={() => setShowInventory(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content inventory-modal-content" onClick={(e) => e.stopPropagation()}>
             <span className="close" onClick={() => setShowInventory(false)}>&times;</span>
-            <h2>Inventory</h2>
+            <h2 className="inventory-title">🎒 Inventory</h2>
+            <div className="inventory-stats">
+              <span className="inventory-count">Total Skins: {inventory.length}</span>
+              <span className="inventory-balance">💰 Balance: ${balance.toFixed(2)}</span>
+              <span className="inventory-rarity-count">
+                Rarities: 
+                {['Consumer Grade', 'Industrial Grade', 'Mil-Spec', 'Restricted', 'Classified', 'Covert', 'Special Item'].map(rarity => {
+                  const count = inventory.filter(s => s.rarity === rarity).length;
+                  if (count > 0) {
+                    return <span key={rarity} className="rarity-badge" style={{backgroundColor: rarityColors[rarity] || '#666'}}>{rarity}: {count}</span>;
+                  }
+                  return null;
+                })}
+              </span>
+            </div>
             {inventory.length === 0 ? (
-              <p>You have no skins.</p>
+              <div className="empty-inventory">
+                <p>🎁 No skins yet!</p>
+                <p>Open some cases to collect skins!</p>
+              </div>
             ) : (
-              <div className="inventory-grid">
-                {inventory.map(skin => (
-                  <img
-                    key={skin.id}
-                    src={skin.image || `https://via.placeholder.com/150x150?text=${encodeURIComponent(typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name)}`}
-                    alt={typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name}
-                    className="inventory-item"
-                    onClick={() => setSelectedSkin(skin)}
-                  />
-                ))}
+              <div className="inventory-scroll-container">
+                <div className="inventory-grid">
+                  {inventory.map(skin => (
+                    <div 
+                      key={skin.id} 
+                      className="inventory-item-card"
+                      onClick={() => setSelectedSkin(skin)}
+                    >
+                      <button 
+                        className="delete-item-btn"
+                        onClick={(e) => deleteFromInventory(skin.id, e)}
+                        title="Delete item"
+                      >
+                        ✕
+                      </button>
+                      <button 
+                        className="sell-item-btn"
+                        onClick={(e) => sellItem(skin, e)}
+                        title={`Sell for ${(skin.price || 10).toFixed(2)}`}
+                      >
+                        💰
+                      </button>
+                      <div className="item-card-image-container">
+                        <img
+                          src={skin.image || `https://via.placeholder.com/150x150?text=${encodeURIComponent(typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name)}`}
+                          alt={typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name}
+                          className="inventory-item"
+                        />
+                        <div className="item-card-rarity-bar" style={{backgroundColor: skin.color || rarityColors[skin.rarity] || '#666'}}></div>
+                      </div>
+                      <div className="item-card-info">
+                        <p className="item-card-name">{typeof skin.name === 'object' ? (skin.name as any).name || 'Skin' : skin.name}</p>
+                        <span className="item-card-rarity" style={{color: skin.color || rarityColors[skin.rarity] || '#666'}}>{skin.rarity}</span>
+                        <span className="item-card-price">${(skin.price || 10).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
