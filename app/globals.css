@@ -27,6 +27,27 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.header-left h1 {
+  margin: 0;
+  margin-right: 0.5rem;
+}
+
+.upgrader-btn {
+  margin-left: 0.5rem;
+  font-size: 1.2rem;
+  padding: 8px 16px;
+  min-width: 120px;
+}
+
 .header-search {
   width: 100%;
   max-width: 400px;

@@ -590,7 +590,10 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
   return (
     <div className="app">
       <div className="header">
-        <h1>CS Case Opening Simulator</h1>
+        <div className="header-left">
+          <h1>CS Case Opening Simulator</h1>
+          <button className="upgrader-btn" onClick={() => setShowUpgrader(true)}>🔧 Upgrader</button>
+        </div>
         <div className="header-search">
           <input
             type="text"
@@ -603,7 +606,6 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
         <div className="header-controls">
           <p className="spin-counter">Total Spins: {spinCount}</p>
           <button className="inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
-          <button className="upgrader-btn" onClick={() => setShowUpgrader(true)}>🔧 Upgrader</button>
           <button className="spin-all-btn" onClick={spinRandomSkin} disabled={rolling}>
             Spin Random Skin
           </button>
