@@ -49,7 +49,7 @@ const rarityPrices: { [key: string]: number } = {
   'Special Item': 200,
 };
 
-export default function Home() {
+export default function Home({ searchQuery }: { searchQuery?: string }) {
   const [skins, setSkins] = useState<Skin[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
   const [openedItem, setOpenedItem] = useState<Skin | null>(null);
@@ -61,8 +61,12 @@ export default function Home() {
   const [inventory, setInventory] = useState<Skin[]>([]);
   const [selectedSkin, setSelectedSkin] = useState<Skin | null>(null);
   const [showInventory, setShowInventory] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [inventorySearchQuery, setInventorySearchQuery] = useState('');
   const [balance, setBalance] = useState<number>(0);
+  const [selectedReward, setSelectedReward] = useState<Skin | null>(null);
+  const [isRewardSelected, setIsRewardSelected] = useState(false);
+  const [showUpgrader, setShowUpgrader] = useState(false);
+  const [upgradeType, setUpgradeType] = useState<'common' | 'green' | 'blue' | 'red' | null>(null);
 
   useEffect(() => {
     // Hardcoded skins for the cases
@@ -393,9 +397,16 @@ export default function Home() {
     setTimeout(() => {
       clearInterval(slideInterval);
 
-      // Let the animation naturally settle without forcing position
-      // The arrow will naturally land on the winning image due to the animation sequence
-      // No forced positioning - natural landing
+      // Calculate the exact position to land on the winning image
+      // Find the last occurrence of the winning image in the animation sequence
+      const winningImageIndex = animationImages.lastIndexOf(winningImage);
+      
+      if (winningImageIndex !== -1) {
+        // Calculate the exact translateY value to position the arrow on the winning image
+        // Each image is 150px wide, so we need to position it at winningImageIndex * 150
+        const targetPosition = -(winningImageIndex * 150);
+        setTranslateY(targetPosition);
+      }
 
       // Wait for arrow to fully stop before showing reward (CS2 style)
       setTimeout(() => {
@@ -459,27 +470,147 @@ export default function Home() {
     startRolling(images, winningSkin);
   };
 
+  // Upgrader functionality
+  const getWeaponsByRarity = (rarity: string) => {
+    return inventory.filter(skin => skin.rarity === rarity);
+  };
+
+  const getKnives = () => {
+    return skins.filter(skin => 
+      skin.name.toLowerCase().includes('knife') || 
+      skin.name.toLowerCase().includes('bayonet') ||
+      skin.name.toLowerCase().includes('dagger') ||
+      skin.name.toLowerCase().includes('karambit') ||
+      skin.name.toLowerCase().includes('butterfly') ||
+      skin.name.toLowerCase().includes('huntsman') ||
+      skin.name.toLowerCase().includes('falchion') ||
+      skin.name.toLowerCase().includes('shadow daggers') ||
+      skin.name.toLowerCase().includes('stiletto') ||
+      skin.name.toLowerCase().includes('bowie') ||
+      skin.name.toLowerCase().includes('paracord')
+    );
+  };
+
+  const getUpgradeRequirements = (upgradeType: string) => {
+    switch (upgradeType) {
+      case 'common':
+        return {
+          requiredCount: 12,
+          fromRarity: 'Consumer Grade',
+          toRarity: 'Industrial Grade',
+          color: '#32cd32'
+        };
+      case 'green':
+        return {
+          requiredCount: 12,
+          fromRarity: 'Industrial Grade', 
+          toRarity: 'Mil-Spec',
+          color: '#00bfff'
+        };
+      case 'blue':
+        return {
+          requiredCount: 12,
+          fromRarity: 'Mil-Spec',
+          toRarity: 'Classified',
+          color: '#ff1493'
+        };
+      case 'red':
+        return {
+          requiredCount: 6,
+          fromRarity: 'Classified',
+          toRarity: 'Special Item',
+          color: '#FFD700'
+        };
+      default:
+        return null;
+    }
+  };
+
+  const canUpgrade = (upgradeType: string) => {
+    const requirements = getUpgradeRequirements(upgradeType);
+    if (!requirements) return false;
+    
+    const weapons = getWeaponsByRarity(requirements.fromRarity);
+    return weapons.length >= requirements.requiredCount;
+  };
+
+  const getUpgradeResult = (upgradeType: string) => {
+    const requirements = getUpgradeRequirements(upgradeType);
+    if (!requirements) return null;
+
+    if (upgradeType === 'red') {
+      // For red to special, get random knife
+      const knives = getKnives();
+      return knives[Math.floor(Math.random() * knives.length)];
+    } else {
+      // For other upgrades, get random weapon of target rarity
+      const targetWeapons = skins.filter(skin => skin.rarity === requirements.toRarity);
+      return targetWeapons[Math.floor(Math.random() * targetWeapons.length)];
+    }
+  };
+
+  const performUpgrade = (upgradeType: string) => {
+    if (!canUpgrade(upgradeType)) return;
+
+    const requirements = getUpgradeRequirements(upgradeType);
+    if (!requirements) return;
+
+    // Get weapons to remove
+    const weaponsToRemove = getWeaponsByRarity(requirements.fromRarity).slice(0, requirements.requiredCount);
+    
+    // Remove weapons from inventory
+    const newInventory = inventory.filter(skin => !weaponsToRemove.some(remove => remove.id === skin.id));
+    
+    // Get upgrade result
+    const upgradeResult = getUpgradeResult(upgradeType);
+    if (!upgradeResult) return;
+
+    // Add result to inventory
+    const finalInventory = [...newInventory, upgradeResult];
+    
+    // Update state and localStorage
+    setInventory(finalInventory);
+    localStorage.setItem('inventory', JSON.stringify(finalInventory.map(s => s.id)));
+    
+    // Show the result
+    setOpenedItem({ 
+      ...upgradeResult, 
+      color: upgradeResult.color || requirements.color 
+    });
+    setSpinCount(prev => prev + 1);
+    
+    // Reset upgrade type
+    setUpgradeType(null);
+  };
+
   if (loading) {
     return <div className="app"><h1>Loading skins...</h1></div>;
   }
 
   return (
     <div className="app">
-      <h1>CS Case Opening Simulator</h1>
-      <input
-        type="text"
-        placeholder="Search cases..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="search-input"
-      />
-      <p className="spin-counter">Total Spins: {spinCount}</p>
-      <button className="inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
-      <button className="spin-all-btn" onClick={spinRandomSkin} disabled={rolling}>
-        Spin Random Skin
-      </button>
+      <div className="header">
+        <h1>CS Case Opening Simulator</h1>
+        <div className="header-search">
+          <input
+            type="text"
+            placeholder="Search cases..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        <div className="header-controls">
+          <p className="spin-counter">Total Spins: {spinCount}</p>
+          <button className="inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
+          <button className="upgrader-btn" onClick={() => setShowUpgrader(true)}>🔧 Upgrader</button>
+          <button className="spin-all-btn" onClick={spinRandomSkin} disabled={rolling}>
+            Spin Random Skin
+          </button>
+        </div>
+      </div>
       <div className="cases-grid">
-        {cases.filter(caseItem => caseItem.name.toLowerCase().includes(searchQuery.toLowerCase())).map(caseItem => (
+        {cases.filter(caseItem => caseItem.name.toLowerCase().includes((searchQuery || '').toLowerCase())).map(caseItem => (
           <img
             key={caseItem.id}
             src={caseItem.image || `https://via.placeholder.com/150x150?text=${encodeURIComponent(caseItem.name)}`}
@@ -532,6 +663,15 @@ export default function Home() {
           <div className="modal-content inventory-modal-content" onClick={(e) => e.stopPropagation()}>
             <span className="close" onClick={() => setShowInventory(false)}>&times;</span>
             <h2 className="inventory-title">🎒 Inventory</h2>
+            <div className="inventory-search-container">
+              <input
+                type="text"
+                placeholder="Search inventory..."
+                value={inventorySearchQuery}
+                onChange={(e) => setInventorySearchQuery(e.target.value)}
+                className="inventory-search-input"
+              />
+            </div>
             <div className="inventory-stats">
               <span className="inventory-count">Total Skins: {inventory.length}</span>
               <span className="inventory-balance">💰 Balance: ${balance.toFixed(2)}</span>
@@ -554,7 +694,9 @@ export default function Home() {
             ) : (
               <div className="inventory-scroll-container">
                 <div className="inventory-grid">
-                  {inventory.map(skin => (
+                  {inventory
+                    .filter(skin => skin.name.toLowerCase().includes(inventorySearchQuery.toLowerCase()))
+                    .map(skin => (
                     <div 
                       key={skin.id} 
                       className="inventory-item-card"
@@ -592,6 +734,150 @@ export default function Home() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showUpgrader && (
+        <div className="upgrader-modal" onClick={() => setShowUpgrader(false)}>
+          <div className="modal-content upgrader-modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close" onClick={() => setShowUpgrader(false)}>&times;</span>
+            <h2 className="upgrader-title">🔧 Weapon Upgrader</h2>
+            
+            {/* Compact Grid Layout for Upgrades */}
+            <div className="upgrade-grid">
+              {/* Common to Green Upgrade */}
+              <div className="upgrade-card">
+                <div className="upgrade-header">
+                  <span className="upgrade-icon">🟢</span>
+                  <h3>Common → Green</h3>
+                </div>
+                <div className="upgrade-stats">
+                  <div className="weapon-count" style={{color: '#8fbc8f'}}>
+                    🟢 Common: {getWeaponsByRarity('Consumer Grade').length}
+                  </div>
+                  <div className="requirement">
+                    🎯 Required: 12 Common
+                  </div>
+                  <div className="status">
+                    {canUpgrade('common') ? (
+                      <span className="status-ready">✅ Ready!</span>
+                    ) : (
+                      <span className="status-not-ready">❌ Need {12 - getWeaponsByRarity('Consumer Grade').length}</span>
+                    )}
+                  </div>
+                </div>
+                <button 
+                  className="upgrade-btn" 
+                  onClick={() => performUpgrade('common')}
+                  disabled={!canUpgrade('common')}
+                  style={{background: '#32cd32'}}
+                >
+                  🔄 Upgrade (12 Common)
+                </button>
+              </div>
+
+              {/* Green to Blue Upgrade */}
+              <div className="upgrade-card">
+                <div className="upgrade-header">
+                  <span className="upgrade-icon">🔵</span>
+                  <h3>Green → Blue</h3>
+                </div>
+                <div className="upgrade-stats">
+                  <div className="weapon-count" style={{color: '#32cd32'}}>
+                    🟢 Green: {getWeaponsByRarity('Industrial Grade').length}
+                  </div>
+                  <div className="requirement">
+                    🎯 Required: 12 Green
+                  </div>
+                  <div className="status">
+                    {canUpgrade('green') ? (
+                      <span className="status-ready">✅ Ready!</span>
+                    ) : (
+                      <span className="status-not-ready">❌ Need {12 - getWeaponsByRarity('Industrial Grade').length}</span>
+                    )}
+                  </div>
+                </div>
+                <button 
+                  className="upgrade-btn" 
+                  onClick={() => performUpgrade('green')}
+                  disabled={!canUpgrade('green')}
+                  style={{background: '#00bfff'}}
+                >
+                  🔄 Upgrade (12 Green)
+                </button>
+              </div>
+
+              {/* Blue to Red Upgrade */}
+              <div className="upgrade-card">
+                <div className="upgrade-header">
+                  <span className="upgrade-icon">🔴</span>
+                  <h3>Blue → Red</h3>
+                </div>
+                <div className="upgrade-stats">
+                  <div className="weapon-count" style={{color: '#00bfff'}}>
+                    🔵 Blue: {getWeaponsByRarity('Mil-Spec').length}
+                  </div>
+                  <div className="requirement">
+                    🎯 Required: 12 Blue
+                  </div>
+                  <div className="status">
+                    {canUpgrade('blue') ? (
+                      <span className="status-ready">✅ Ready!</span>
+                    ) : (
+                      <span className="status-not-ready">❌ Need {12 - getWeaponsByRarity('Mil-Spec').length}</span>
+                    )}
+                  </div>
+                </div>
+                <button 
+                  className="upgrade-btn" 
+                  onClick={() => performUpgrade('blue')}
+                  disabled={!canUpgrade('blue')}
+                  style={{background: '#ff1493'}}
+                >
+                  🔄 Upgrade (12 Blue)
+                </button>
+              </div>
+
+              {/* Red to Special Upgrade */}
+              <div className="upgrade-card">
+                <div className="upgrade-header">
+                  <span className="upgrade-icon">⭐</span>
+                  <h3>Red → Special</h3>
+                </div>
+                <div className="upgrade-stats">
+                  <div className="weapon-count" style={{color: '#ff1493'}}>
+                    🔴 Red: {getWeaponsByRarity('Classified').length}
+                  </div>
+                  <div className="requirement">
+                    🎯 Required: 6 Red
+                  </div>
+                  <div className="status">
+                    {canUpgrade('red') ? (
+                      <span className="status-ready">✅ Ready!</span>
+                    ) : (
+                      <span className="status-not-ready">❌ Need {6 - getWeaponsByRarity('Classified').length}</span>
+                    )}
+                  </div>
+                </div>
+                <button 
+                  className="upgrade-btn" 
+                  onClick={() => performUpgrade('red')}
+                  disabled={!canUpgrade('red')}
+                  style={{background: '#FFD700', color: '#000'}}
+                >
+                  ⭐ Upgrade (6 Red Knives)
+                </button>
+              </div>
+            </div>
+
+            <div className="upgrader-description">
+              <p><strong>Tiered Upgrade System:</strong></p>
+              <p>• 12 Common (Consumer Grade) = 1 Green (Industrial Grade)</p>
+              <p>• 12 Green (Industrial Grade) = 1 Blue (Mil-Spec)</p>
+              <p>• 12 Blue (Mil-Spec) = 1 Red (Classified)</p>
+              <p>• 6 Red (Classified) = 1 Special Item (Random Knife)</p>
+            </div>
           </div>
         </div>
       )}
