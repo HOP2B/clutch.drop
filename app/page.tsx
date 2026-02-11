@@ -84,6 +84,8 @@ const PREMIUM_SKINS: Skin[] = [
   
   // Special / Rare Knives
   { id: 50, name: 'Karambit | Doppler Sapphire', rarity: 'Special', color: '#ffd700', price: 350, image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/images/wiki_sLfXhlc_preview.png', isSpecial: true },
+  // Rward Special Skin
+  { id: 999, name: 'Rward Special', rarity: 'Special', color: '#ffd700', price: 500, image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/images/wiki_sLfXhlc_preview.png', isSpecial: true },
   { id: 51, name: 'Butterfly Knife | Doppler Sapphire', rarity: 'Special', color: '#ffd700', price: 380, image: 'https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf0ebcZThQ6tCvq4GGqOXhMaLum2pD6sl0g_PE8bP5gVO8v11tZGmgINfDJAU_NArYqVO8weq80ZXvuZ_Pm3NluSNz5n7dm0Phgk4YcKUx0gttBNHX', isSpecial: true },
   { id: 52, name: 'M9 Bayonet | Doppler Sapphire', rarity: 'Special', color: '#ffd700', price: 320, image: 'https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf3qr3czxb49KzgL-KmsjnMqvBnmJD7fp8i_vD-Yn8klGwlB81NDG3OtSUJgY7YVvS-VfolLq7hsO5tZ_OnXo3uyhz7SyPnhGx0xoeb-dugKOACQLJ28w8Lgw', isSpecial: true },
   { id: 53, name: 'Karambit | Ruby', rarity: 'Special', color: '#ffd700', price: 400, image: 'https://pub-5f12f7508ff04ae5925853dee0438460.r2.dev/data/images/wiki_W2yOMPY_preview.png', isSpecial: true },
@@ -178,9 +180,24 @@ export default function Home() {
   const [rolling, setRolling] = useState(false);
   const [spinCount, setSpinCount] = useState(0);
   const [balance, setBalance] = useState(1000); // Starting balance
-  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentCase, setCurrentCase] = useState<Case | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeType, setUpgradeType] = useState<'blue-to-purple' | 'purple-to-red' | 'red-to-knife' | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Load stats from localStorage
+  useEffect(() => {
+    const savedSpinCount = localStorage.getItem('spinCount');
+    const savedBalance = localStorage.getItem('balance');
+    
+    if (savedSpinCount) {
+      setSpinCount(parseInt(savedSpinCount, 10));
+    }
+    if (savedBalance) {
+      setBalance(parseInt(savedBalance, 10));
+    }
+  }, []);
 
   // Load inventory from localStorage
   useEffect(() => {
@@ -210,7 +227,8 @@ export default function Home() {
     // Weighted random selection
     let random = Math.random() * totalWeight;
     for (const skin of availableSkins) {
-      random -= RARITY_CONFIG[skin.rarity]?.weight || 1;
+      const weight = RARITY_CONFIG[skin.rarity]?.weight || 1;
+      random -= weight;
       if (random <= 0) {
         return skin;
       }
@@ -220,7 +238,7 @@ export default function Home() {
   }, []);
 
   // Start case opening animation
-  const startRolling = useCallback((caseItem: Case) => {
+  const startRolling = useCallback((caseItem: Case, targetSkinId?: number, hiddenReward?: boolean) => {
     if (rolling || balance < (caseItem.price || 0)) return;
 
     setRolling(true);
@@ -229,10 +247,20 @@ export default function Home() {
     setShowWinOverlay(false);
 
     // Deduct balance
-    setBalance(prev => prev - (caseItem.price || 0));
+    setBalance(prev => {
+      const newBalance = prev - (caseItem.price || 0);
+      localStorage.setItem('balance', newBalance.toString());
+      return newBalance;
+    });
 
-    // Select winning skin
-    const wonSkin = selectRandomSkin(caseItem.contains);
+    // Select winning skin - either target specific skin or random
+    let wonSkin: Skin;
+    if (targetSkinId) {
+      // Find the specific guns skin
+      wonSkin = PREMIUM_SKINS.find(s => s.id === targetSkinId) || selectRandomSkin(caseItem.contains);
+    } else {
+      wonSkin = selectRandomSkin(caseItem.contains);
+    }
     setWinningSkin(wonSkin);
 
     // Create animation sequence
@@ -249,21 +277,13 @@ export default function Home() {
     // Phase 2: Slowing down with glimpses of winning skin (200 frames)
     for (let i = 0; i < 200; i++) {
       const randomChance = Math.random();
-      if (randomChance < 0.15 && i > 50) {
-        animationSequence.push(wonSkin.image || '');
-      } else {
+      if (hiddenReward) {
+        // If hidden reward, use random skins throughout the animation
         const randomIndex = Math.floor(Math.random() * skinImages.length);
         animationSequence.push(skinImages[randomIndex]);
-      }
-    }
-
-    // Phase 3: Final approach (100 frames)
-    for (let i = 0; i < 100; i++) {
-      if (i > 70) {
-        animationSequence.push(wonSkin.image || '');
       } else {
-        const randomChance = Math.random();
-        if (randomChance < 0.2) {
+        // If not hidden, show glimpses of winning skin
+        if (randomChance < 0.15 && i > 50) {
           animationSequence.push(wonSkin.image || '');
         } else {
           const randomIndex = Math.floor(Math.random() * skinImages.length);
@@ -272,21 +292,59 @@ export default function Home() {
       }
     }
 
-    // Ensure winning skin appears at the end
-    for (let i = 0; i < 10; i++) {
-      animationSequence.push(wonSkin.image || '');
+    // Phase 3: Final approach (100 frames)
+    for (let i = 0; i < 100; i++) {
+      if (hiddenReward) {
+        // If hidden reward, continue showing random skins until the very end
+        if (i > 97) {
+          animationSequence.push(wonSkin.image || '');
+        } else {
+          const randomIndex = Math.floor(Math.random() * skinImages.length);
+          animationSequence.push(skinImages[randomIndex]);
+        }
+      } else {
+        // If not hidden, show winning skin more frequently
+        if (i > 70) {
+          animationSequence.push(wonSkin.image || '');
+        } else {
+          const randomChance = Math.random();
+          if (randomChance < 0.2) {
+            animationSequence.push(wonSkin.image || '');
+          } else {
+            const randomIndex = Math.floor(Math.random() * skinImages.length);
+            animationSequence.push(skinImages[randomIndex]);
+          }
+        }
+      }
+    }
+
+    // Special handling for rward skin - make it appear 40 times
+    if (wonSkin.id === 999) {
+      for (let i = 0; i < 40; i++) {
+        animationSequence.push(wonSkin.image || '');
+      }
+    } else {
+      // Ensure winning skin appears at the end
+      for (let i = 0; i < 10; i++) {
+        animationSequence.push(wonSkin.image || '');
+      }
     }
 
     setSlotImages(animationSequence);
 
     // Animate
     let frame = 0;
-    const imageWidth = 220;
+    const imageWidth = 190; // Updated for new image width + margin
     const totalFrames = animationSequence.length;
+    const startTime = Date.now();
+    const animationDuration = 3000; // 3 seconds total animation
     
     const animate = () => {
-      frame++;
-      const progress = frame / totalFrames;
+      const elapsed = Date.now() - startTime;
+      let progress = elapsed / animationDuration;
+      
+      // Clamp progress between 0 and 1
+      if (progress > 1) progress = 1;
       
       // Easing function for smooth deceleration
       const easeOut = 1 - Math.pow(1 - progress, 3);
@@ -294,7 +352,7 @@ export default function Home() {
       
       setTranslateX(-position);
 
-      if (frame < totalFrames) {
+      if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
         // Animation complete
@@ -302,7 +360,11 @@ export default function Home() {
           setShowSlotMachine(false);
           setShowWinOverlay(true);
           setRolling(false);
-          setSpinCount(prev => prev + 1);
+          setSpinCount(prev => {
+            const newSpinCount = prev + 1;
+            localStorage.setItem('spinCount', newSpinCount.toString());
+            return newSpinCount;
+          });
           
           // Add to inventory
           setInventory(prev => {
@@ -328,7 +390,11 @@ export default function Home() {
     setShowSlotMachine(true);
     setShowWinOverlay(false);
 
-    setBalance(prev => prev - 10);
+    setBalance(prev => {
+      const newBalance = prev - 10;
+      localStorage.setItem('balance', newBalance.toString());
+      return newBalance;
+    });
 
     const allSkinIds = CASES.flatMap(c => c.contains);
     const wonSkin = selectRandomSkin(allSkinIds);
@@ -349,26 +415,36 @@ export default function Home() {
 
     setSlotImages(animationSequence);
 
-    let frame = 0;
+    const startTime = Date.now();
     const imageWidth = 220;
     const totalFrames = animationSequence.length;
+    const animationDuration = 2500; // 2.5 seconds for quick spin
     
     const animate = () => {
-      frame++;
-      const progress = frame / totalFrames;
+      const elapsed = Date.now() - startTime;
+      let progress = elapsed / animationDuration;
+      
+      // Clamp progress between 0 and 1
+      if (progress > 1) progress = 1;
+      
+      // Easing function for smooth deceleration
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const position = easeOut * (totalFrames * imageWidth);
       
       setTranslateX(-position);
 
-      if (frame < totalFrames) {
+      if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
         setTimeout(() => {
           setShowSlotMachine(false);
           setShowWinOverlay(true);
           setRolling(false);
-          setSpinCount(prev => prev + 1);
+          setSpinCount(prev => {
+            const newSpinCount = prev + 1;
+            localStorage.setItem('spinCount', newSpinCount.toString());
+            return newSpinCount;
+          });
           
           setInventory(prev => {
             if (!prev.some(s => s.id === wonSkin.id)) {
@@ -415,6 +491,97 @@ export default function Home() {
   const getRarityGradient = (rarity: string) => {
     return RARITY_CONFIG[rarity]?.gradient || 'rarity-consumer';
   };
+
+  // Helper functions for upgrade system
+  const countItemsByRarity = useCallback((rarity: string) => {
+    return inventory.filter(s => s.rarity === rarity).length;
+  }, [inventory]);
+
+  const getItemsByRarity = useCallback((rarity: string) => {
+    return inventory.filter(s => s.rarity === rarity);
+  }, [inventory]);
+
+  const getUpgradeRequirements = useCallback((type: string) => {
+    switch (type) {
+      case 'blue-to-purple':
+        return {
+          from: 'Mil-Spec',
+          to: 'Classified',
+          count: 12,
+          color: '#00bfff',
+          toColor: '#ff1493'
+        };
+      case 'purple-to-red':
+        return {
+          from: 'Classified',
+          to: 'Covert',
+          count: 12,
+          color: '#ff1493',
+          toColor: '#dc143c'
+        };
+      case 'red-to-knife':
+        return {
+          from: 'Covert',
+          to: 'Special',
+          count: 6,
+          color: '#dc143c',
+          toColor: '#ffd700'
+        };
+      default:
+        return null;
+    }
+  }, []);
+
+  const performUpgrade = useCallback((type: string) => {
+    const requirements = getUpgradeRequirements(type);
+    if (!requirements) return;
+
+    const itemsToRemove = getItemsByRarity(requirements.from).slice(0, requirements.count);
+    
+    if (itemsToRemove.length < requirements.count) {
+      alert(`Not enough ${requirements.from} items. You need ${requirements.count} but only have ${itemsToRemove.length}.`);
+      return;
+    }
+
+    // Remove items from inventory
+    const newInventory = inventory.filter(s => !itemsToRemove.includes(s));
+    
+    // Get possible upgrade skins based on rarity
+    let upgradeSkins: Skin[] = [];
+    
+    switch (type) {
+      case 'blue-to-purple':
+        // Mil-Spec to Classified - get Classified skins
+        upgradeSkins = PREMIUM_SKINS.filter(s => s.rarity === 'Classified');
+        break;
+      case 'purple-to-red':
+        // Classified to Covert - get Covert skins
+        upgradeSkins = PREMIUM_SKINS.filter(s => s.rarity === 'Covert');
+        break;
+      case 'red-to-knife':
+        // Covert to Special (Knives) - get Special knives
+        upgradeSkins = PREMIUM_SKINS.filter(s => s.rarity === 'Special' && s.isSpecial);
+        break;
+    }
+
+    // Select random upgrade skin
+    const randomIndex = Math.floor(Math.random() * upgradeSkins.length);
+    const upgradedSkin = upgradeSkins[randomIndex];
+    
+    // Add upgraded skin to inventory
+    newInventory.push(upgradedSkin);
+    
+    // Update state
+    setInventory(newInventory);
+    localStorage.setItem('inventory', JSON.stringify(newInventory.map(s => s.id)));
+    
+    // Show success message
+    alert(`Successfully upgraded ${requirements.count} ${requirements.from} items to 1 ${upgradedSkin.name}!`);
+    
+    // Close modal
+    setShowUpgradeModal(false);
+    setUpgradeType(null);
+  }, [inventory, getItemsByRarity, getUpgradeRequirements]);
 
   // Filter cases by search
   const filteredCases = CASES.filter(c => 
@@ -477,17 +644,32 @@ export default function Home() {
       {/* Quick Actions */}
       <div className="quick-actions">
         <button 
-          className="action-btn primary"
-          onClick={quickSpin}
-          disabled={rolling || balance < 10}
+          className="action-btn guns"
+          onClick={() => {
+            // Find a case that contains the AK-47 | Redline skin (ID: 1)
+            const gunsCase = CASES.find(c => c.contains.includes(1));
+            if (gunsCase) {
+              startRolling(gunsCase, 1, true); // Target the AK-47 | Redline skin with hidden reward
+            } else {
+              // Fallback to quick spin if no case contains the target skin
+              quickSpin();
+            }
+          }}
+          disabled={rolling || balance < 15}
         >
-          ⚡ Quick Spin ($10)
+          🔫 Spin Guns ($15)
         </button>
         <button 
           className="action-btn secondary"
           onClick={() => setShowInventory(true)}
         >
           🎒 Inventory
+        </button>
+        <button 
+          className="action-btn upgrade"
+          onClick={() => setShowUpgradeModal(true)}
+        >
+          🔧 Upgrade Items
         </button>
       </div>
 
@@ -587,7 +769,7 @@ export default function Home() {
               <button className="close-modal-btn" onClick={() => setShowInventory(false)}>✕</button>
             </div>
 
-            <div className="inventory-stats">
+            <div className="inventory-stats centered-stats">
               <div className="inventory-stat">
                 <div className="inventory-stat-value">{inventory.length}</div>
                 <div className="inventory-stat-label">Items</div>
@@ -657,6 +839,255 @@ export default function Home() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <div className="inventory-modal">
+          <div className="inventory-content">
+            <div className="inventory-header">
+              <h2 className="inventory-title">🔧 <span className="glow-text">Item Upgrade System</span></h2>
+              <button className="close-modal-btn" onClick={() => setShowUpgradeModal(false)}>✕</button>
+            </div>
+
+            <div className="inventory-stats">
+              <div className="inventory-stat">
+                <div className="inventory-stat-value glow-blue">{inventory.length}</div>
+                <div className="inventory-stat-label">Total Items</div>
+              </div>
+              <div className="inventory-stat">
+                <div className="inventory-stat-value glow-gold">
+                  ${inventory.reduce((sum, s) => sum + (s.price || 0), 0)}
+                </div>
+                <div className="inventory-stat-label">Total Value</div>
+              </div>
+            </div>
+
+            <div className="inventory-scroll">
+              <div className="upgrade-grid-separated">
+                {/* Blue to Purple (Mil-Spec to Classified) */}
+                <div className="upgrade-card-separated">
+                  <div className="upgrade-card-header-separated">
+                    <div className="upgrade-card-title-container-separated">
+                      <h3 className="upgrade-card-title-separated">Mil-Spec → Classified</h3>
+                      <div className="upgrade-ratio-badge-separated">12:1</div>
+                    </div>
+                    <div className="upgrade-card-subtitle-separated">Upgrade 12 Mil-Spec items to get 1 Classified item</div>
+                  </div>
+                  <div className="upgrade-card-content-separated">
+                    <div className="upgrade-item-preview-separated">
+                      <div className="upgrade-item-image-container-separated">
+                        <div className="upgrade-item-image-placeholder-separated upgrade-item-blue">
+                          <span className="upgrade-item-count-separated">12x</span>
+                          <div className="upgrade-item-glow-separated"></div>
+                        </div>
+                        <div className="item-rarity-bar rarity-milspec"></div>
+                      </div>
+                      <div className="upgrade-item-info-separated">
+                        <p className="upgrade-item-name-separated">Mil-Spec</p>
+                        <p className="upgrade-item-rarity-separated upgrade-rarity-blue">Mil-Spec</p>
+                      </div>
+                    </div>
+                    <div className="upgrade-arrow-container-separated">
+                      <div className="upgrade-arrow-separated upgrade-arrow-blue">→</div>
+                    </div>
+                    <div className="upgrade-item-preview-separated">
+                      <div className="upgrade-item-image-container-separated">
+                        <div className="upgrade-item-image-placeholder-separated upgrade-item-pink">
+                          <span className="upgrade-item-count-separated">1x</span>
+                          <div className="upgrade-item-glow-separated"></div>
+                        </div>
+                        <div className="item-rarity-bar rarity-classified"></div>
+                      </div>
+                      <div className="upgrade-item-info-separated">
+                        <p className="upgrade-item-name-separated">Classified</p>
+                        <p className="upgrade-item-rarity-separated upgrade-rarity-pink">Classified</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="upgrade-card-footer-separated">
+                    <div className="upgrade-stats-separated">
+                      <div className="upgrade-progress-separated">
+                        <div className="upgrade-progress-bar-separated">
+                          <div 
+                            className="upgrade-progress-fill-separated upgrade-progress-blue"
+                            style={{ 
+                              width: `${Math.min((countItemsByRarity('Mil-Spec') / 12) * 100, 100)}%`,
+                              backgroundColor: countItemsByRarity('Mil-Spec') >= 12 ? '#4CAF50' : '#ff9800'
+                            }}
+                          ></div>
+                        </div>
+                        <span className="upgrade-progress-text-separated upgrade-progress-text-blue">
+                          {countItemsByRarity('Mil-Spec')}/12 items
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      className={`upgrade-action-btn-separated ${countItemsByRarity('Mil-Spec') >= 12 ? 'available' : 'unavailable'} upgrade-btn-blue`}
+                      onClick={() => performUpgrade('blue-to-purple')}
+                      disabled={countItemsByRarity('Mil-Spec') < 12}
+                    >
+                      <span className="upgrade-btn-text-separated">
+                        {countItemsByRarity('Mil-Spec') >= 12 ? 'Upgrade to Classified' : 'Need 12 Mil-Spec'}
+                      </span>
+                      {countItemsByRarity('Mil-Spec') >= 12 && (
+                        <span className="upgrade-btn-icon-separated">✨</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Purple to Red (Classified to Covert) */}
+                <div className="upgrade-card-separated">
+                  <div className="upgrade-card-header-separated">
+                    <div className="upgrade-card-title-container-separated">
+                      <h3 className="upgrade-card-title-separated">Classified → Covert</h3>
+                      <div className="upgrade-ratio-badge-separated">12:1</div>
+                    </div>
+                    <div className="upgrade-card-subtitle-separated">Upgrade 12 Classified items to get 1 Covert item</div>
+                  </div>
+                  <div className="upgrade-card-content-separated">
+                    <div className="upgrade-item-preview-separated">
+                      <div className="upgrade-item-image-container-separated">
+                        <div className="upgrade-item-image-placeholder-separated upgrade-item-pink">
+                          <span className="upgrade-item-count-separated">12x</span>
+                          <div className="upgrade-item-glow-separated"></div>
+                        </div>
+                        <div className="item-rarity-bar rarity-classified"></div>
+                      </div>
+                      <div className="upgrade-item-info-separated">
+                        <p className="upgrade-item-name-separated">Classified</p>
+                        <p className="upgrade-item-rarity-separated upgrade-rarity-pink">Classified</p>
+                      </div>
+                    </div>
+                    <div className="upgrade-arrow-container-separated">
+                      <div className="upgrade-arrow-separated upgrade-arrow-pink">→</div>
+                    </div>
+                    <div className="upgrade-item-preview-separated">
+                      <div className="upgrade-item-image-container-separated">
+                        <div className="upgrade-item-image-placeholder-separated upgrade-item-red">
+                          <span className="upgrade-item-count-separated">1x</span>
+                          <div className="upgrade-item-glow-separated"></div>
+                        </div>
+                        <div className="item-rarity-bar rarity-covert"></div>
+                      </div>
+                      <div className="upgrade-item-info-separated">
+                        <p className="upgrade-item-name-separated">Covert</p>
+                        <p className="upgrade-item-rarity-separated upgrade-rarity-red">Covert</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="upgrade-card-footer-separated">
+                    <div className="upgrade-stats-separated">
+                      <div className="upgrade-progress-separated">
+                        <div className="upgrade-progress-bar-separated">
+                          <div 
+                            className="upgrade-progress-fill-separated upgrade-progress-pink"
+                            style={{ 
+                              width: `${Math.min((countItemsByRarity('Classified') / 12) * 100, 100)}%`,
+                              backgroundColor: countItemsByRarity('Classified') >= 12 ? '#4CAF50' : '#ff9800'
+                            }}
+                          ></div>
+                        </div>
+                        <span className="upgrade-progress-text-separated upgrade-progress-text-pink">
+                          {countItemsByRarity('Classified')}/12 items
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      className={`upgrade-action-btn-separated ${countItemsByRarity('Classified') >= 12 ? 'available' : 'unavailable'} upgrade-btn-pink`}
+                      onClick={() => performUpgrade('purple-to-red')}
+                      disabled={countItemsByRarity('Classified') < 12}
+                    >
+                      <span className="upgrade-btn-text-separated">
+                        {countItemsByRarity('Classified') >= 12 ? 'Upgrade to Covert' : 'Need 12 Classified'}
+                      </span>
+                      {countItemsByRarity('Classified') >= 12 && (
+                        <span className="upgrade-btn-icon-separated">🔥</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Red to Knife (Covert to Special) */}
+                <div className="upgrade-card-separated">
+                  <div className="upgrade-card-header-separated">
+                    <div className="upgrade-card-title-container-separated">
+                      <h3 className="upgrade-card-title-separated">Covert → Special Knife</h3>
+                      <div className="upgrade-ratio-badge-separated">6:1</div>
+                    </div>
+                    <div className="upgrade-card-subtitle-separated">Upgrade 6 Covert items to get 1 Guaranteed Special Knife</div>
+                  </div>
+                  <div className="upgrade-card-content-separated">
+                    <div className="upgrade-item-preview-separated">
+                      <div className="upgrade-item-image-container-separated">
+                        <div className="upgrade-item-image-placeholder-separated upgrade-item-red">
+                          <span className="upgrade-item-count-separated">6x</span>
+                          <div className="upgrade-item-glow-separated"></div>
+                        </div>
+                        <div className="item-rarity-bar rarity-covert"></div>
+                      </div>
+                      <div className="upgrade-item-info-separated">
+                        <p className="upgrade-item-name-separated">Covert</p>
+                        <p className="upgrade-item-rarity-separated upgrade-rarity-red">Covert</p>
+                      </div>
+                    </div>
+                    <div className="upgrade-arrow-container-separated">
+                      <div className="upgrade-arrow-separated upgrade-arrow-red">→</div>
+                    </div>
+                    <div className="upgrade-item-preview-separated">
+                      <div className="upgrade-item-image-container-separated">
+                        <div className="upgrade-item-image-placeholder-separated upgrade-item-gold">
+                          <span className="upgrade-item-count-separated">1x</span>
+                          <div className="upgrade-item-glow-separated"></div>
+                        </div>
+                        <div className="item-rarity-bar rarity-special"></div>
+                      </div>
+                      <div className="upgrade-item-info-separated">
+                        <p className="upgrade-item-name-separated">Special Knife</p>
+                        <p className="upgrade-item-rarity-separated upgrade-rarity-gold">Special</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="upgrade-card-footer-separated">
+                    <div className="upgrade-stats-separated">
+                      <div className="upgrade-progress-separated">
+                        <div className="upgrade-progress-bar-separated">
+                          <div 
+                            className="upgrade-progress-fill-separated upgrade-progress-red"
+                            style={{ 
+                              width: `${Math.min((countItemsByRarity('Covert') / 6) * 100, 100)}%`,
+                              backgroundColor: countItemsByRarity('Covert') >= 6 ? '#4CAF50' : '#ff9800'
+                            }}
+                          ></div>
+                        </div>
+                        <span className="upgrade-progress-text-separated upgrade-progress-text-red">
+                          {countItemsByRarity('Covert')}/6 items
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      className={`upgrade-action-btn-separated ${countItemsByRarity('Covert') >= 6 ? 'available' : 'unavailable'} upgrade-btn-red`}
+                      onClick={() => performUpgrade('red-to-knife')}
+                      disabled={countItemsByRarity('Covert') < 6}
+                    >
+                      <span className="upgrade-btn-text-separated">
+                        {countItemsByRarity('Covert') >= 6 ? 'Upgrade to Knife (Guaranteed!)' : 'Need 6 Covert'}
+                      </span>
+                      {countItemsByRarity('Covert') >= 6 && (
+                        <span className="upgrade-btn-icon-separated">🗡️</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="upgrade-info">
+              <p><strong>Note:</strong> Upgrades are guaranteed! You will receive a random item of the target rarity.</p>
             </div>
           </div>
         </div>
